@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes attributions{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Mes attributions d'équipements</h1>
+
+    <div class="table-responsive mt-4">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Équipement</th>
+                    <th>Type</th>
+                    <th>État</th>
+                    <th>Date d'attribution</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attribution in attributions %}
+                    <tr>
+                        <td>{{ attribution.equipement.nom }}</td>
+                        <td>{{ attribution.equipement.type }}</td>
+                        <td>
+                            <span class="badge {% if attribution.equipement.etat == 'Bon' %}bg-success{% elseif attribution.equipement.etat == 'Moyen' %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ attribution.equipement.etat }}
+                            </span>
+                        </td>
+                        <td>{{ attribution.dateAttribution|date('d/m/Y H:i') }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">Aucune attribution trouvée</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

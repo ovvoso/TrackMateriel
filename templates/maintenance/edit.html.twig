@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Maintenance{% endblock %}
+
+{% block body %}
+    <h1>Edit Maintenance</h1>
+
+    {{ include('maintenance/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_maintenance_index') }}">back to list</a>
+
+    {{ include('maintenance/_delete_form.html.twig') }}
+{% endblock %}

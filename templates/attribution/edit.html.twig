@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Attribution{% endblock %}
+
+{% block body %}
+    <h1>Edit Attribution</h1>
+
+    {{ include('attribution/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_attribution_index') }}">back to list</a>
+
+    {{ include('attribution/_delete_form.html.twig') }}
+{% endblock %}

@@ -4,14 +4,29 @@ security:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             lazy: true
-            provider: users_in_memory
+            provider: app_user_provider
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+                default_target_path: login_success
+                always_use_default_target_path: false
+                target_path_parameter: _target_path
+                use_referer: true
+            logout:
+                path: app_logout
+                target: app_login
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -22,8 +37,41 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # Routes publiques
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/reset-password, roles: PUBLIC_ACCESS }
+        - { path: ^/login-success, roles: IS_AUTHENTICATED_FULLY }
+        
+        # Routes d'administration
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        
+        # Routes utilisateur
+        - { path: ^/user, roles: ROLE_USER }
+        
+        # Routes équipement - Admin seulement pour création/modification
+        - { path: ^/equipement/new, roles: ROLE_ADMIN }
+        - { path: ^/equipement/.*/edit, roles: ROLE_ADMIN }
+        - { path: ^/equipement/.*/delete, roles: ROLE_ADMIN }
+        - { path: ^/equipement, roles: ROLE_USER }
+        
+        # Routes attribution - Admin seulement pour création/modification
+        - { path: ^/attribution/new, roles: ROLE_ADMIN }
+        - { path: ^/attribution/.*/edit, roles: ROLE_ADMIN }
+        - { path: ^/attribution/.*/delete, roles: ROLE_ADMIN }
+        - { path: ^/attribution, roles: ROLE_USER }
+        
+        # Routes maintenance - Utilisateurs connectés
+        - { path: ^/maintenance, roles: ROLE_USER }
+        
+        # Route profil utilisateur
+        - { path: ^/profile, roles: ROLE_USER }
+        
+        # Page d'accueil accessible aux utilisateurs connectés
+        - { path: ^/home, roles: ROLE_USER }
+        
+        # Redirection par défaut vers login pour les non-connectés
+        - { path: ^/, roles: PUBLIC_ACCESS }
 
 when@test:
     security:

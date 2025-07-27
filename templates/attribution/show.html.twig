@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Attribution{% endblock %}
+
+{% block body %}
+    <h1>Attribution</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ attribution.id }}</td>
+            </tr>
+            <tr>
+                <th>DateAttribution</th>
+                <td>{{ attribution.dateAttribution ? attribution.dateAttribution|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_attribution_index') }}">back to list</a>
+
+    <a href="{{ path('app_attribution_edit', {'id': attribution.id}) }}">edit</a>
+
+    {{ include('attribution/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Maintenance{% endblock %}
+
+{% block body %}
+    <h1>Maintenance</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ maintenance.id }}</td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>{{ maintenance.date ? maintenance.date|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Observation</th>
+                <td>{{ maintenance.observation }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_maintenance_index') }}">back to list</a>
+
+    <a href="{{ path('app_maintenance_edit', {'id': maintenance.id}) }}">edit</a>
+
+    {{ include('maintenance/_delete_form.html.twig') }}
+{% endblock %}
