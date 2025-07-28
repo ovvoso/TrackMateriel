@@ -9,7 +9,9 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>DateAttribution</th>
+                <th>Date d'attribution</th>
+                <th>Equipement</th>
+                <th>Utilisateur</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -18,6 +20,8 @@
             <tr>
                 <td>{{ attribution.id }}</td>
                 <td>{{ attribution.dateAttribution ? attribution.dateAttribution|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ attribution.equipement ? attribution.equipement.nom : '' }}</td>
+                <td>{{ attribution.utilisateur ? attribution.utilisateur.username : '' }}</td>
                 <td>
                     <a href="{{ path('app_attribution_show', {'id': attribution.id}) }}">show</a>
                     <a href="{{ path('app_attribution_edit', {'id': attribution.id}) }}">edit</a>
@@ -25,7 +29,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="3">no records found</td>
+                <td colspan="5">no records found</td>
             </tr>
         {% endfor %}
         </tbody>

@@ -12,8 +12,28 @@
                 <td>{{ attribution.id }}</td>
             </tr>
             <tr>
-                <th>DateAttribution</th>
-                <td>{{ attribution.dateAttribution ? attribution.dateAttribution|date('Y-m-d H:i:s') : '' }}</td>
+                <th>Date d'attribution</th>
+                <td>{{ attribution.dateAttribution ? attribution.dateAttribution|date('d/m/Y H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Équipement</th>
+                <td>{{ attribution.equipement ? attribution.equipement.nom : '' }}</td>
+            </tr>
+            <tr>
+                <th>Type d'équipement</th>
+                <td>{{ attribution.equipement ? attribution.equipement.type : '' }}</td>
+            </tr>
+            <tr>
+                <th>État de l'équipement</th>
+                <td>{{ attribution.equipement ? attribution.equipement.etat : '' }}</td>
+            </tr>
+            <tr>
+                <th>Utilisateur</th>
+                <td>{{ attribution.utilisateur ? attribution.utilisateur.username : '' }}</td>
+            </tr>
+            <tr>
+                <th>Email utilisateur</th>
+                <td>{{ attribution.utilisateur ? attribution.utilisateur.email : '' }}</td>
             </tr>
         </tbody>
     </table>

@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Attribution;
-use App\Form\Attribution1Type;
+use App\Form\AttributionType;
 use App\Repository\AttributionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,7 +26,7 @@ final class AttributionController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $attribution = new Attribution();
-        $form = $this->createForm(Attribution1Type::class, $attribution);
+        $form = $this->createForm(AttributionType::class, $attribution);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -53,7 +53,7 @@ final class AttributionController extends AbstractController
     #[Route('/{id}/edit', name: 'app_attribution_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Attribution $attribution, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(Attribution1Type::class, $attribution);
+        $form = $this->createForm(AttributionType::class, $attribution);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

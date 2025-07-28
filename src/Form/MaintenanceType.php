@@ -18,9 +18,12 @@ class MaintenanceType extends AbstractType
                 'widget' => 'single_text',
             ])
             ->add('observation')
+
             ->add('equipement', EntityType::class, [
                 'class' => Equipement::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
+                'label' => 'Équipement',
+                'placeholder' => 'Choisir un équipement',
             ])
         ;
     }
