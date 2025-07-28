@@ -10,36 +10,39 @@
         <div class="row">
             <div class="col-md-12 mb-4">
                 <div class="form-group">
+                    <i class="fas fa-calendar-alt icon-contextual"></i>
                     {{ form_label(form.dateAttribution, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
                     {{ form_widget(form.dateAttribution, {'attr': {'class': 'form-control'}}) }}
-                    <div class="form-text">
+                    {# <div class="form-text">
                         <i class="fas fa-calendar-alt icon-contextual"></i>
                         Date et heure d'attribution de l'équipement
-                    </div>
+                    </div> #}
                     {{ form_errors(form.dateAttribution) }}
                 </div>
             </div>
             
             <div class="col-md-6 mb-3">
                 <div class="form-group">
+                    <i class="fas fa-desktop icon-contextual"></i>
                     {{ form_label(form.equipement, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
                     {{ form_widget(form.equipement, {'attr': {'class': 'form-select'}}) }}
-                    <div class="form-text">
+                    {# <div class="form-text">
                         <i class="fas fa-desktop icon-contextual"></i>
                         Sélectionnez l'équipement à attribuer
-                    </div>
+                    </div> #}
                     {{ form_errors(form.equipement) }}
                 </div>
             </div>
             
             <div class="col-md-6 mb-3">
                 <div class="form-group">
+                    <i class="fas fa-user icon-contextual"></i>
                     {{ form_label(form.utilisateur, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
                     {{ form_widget(form.utilisateur, {'attr': {'class': 'form-select'}}) }}
-                    <div class="form-text">
+                    {# <div class="form-text">
                         <i class="fas fa-user icon-contextual"></i>
                         Choisissez l'utilisateur bénéficiaire
-                    </div>
+                    </div> #}
                     {{ form_errors(form.utilisateur) }}
                 </div>
             </div>

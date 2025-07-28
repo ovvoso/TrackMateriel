@@ -12,10 +12,10 @@
                 <div class="form-group">
                     {{ form_label(form.nom, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
                     {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
-                    <div class="form-text">
+                    {# <div class="form-text">
                         <i class="fas fa-info-circle icon-contextual"></i>
                         Donnez un nom unique et descriptif à votre équipement
-                    </div>
+                    </div> #}
                     {{ form_errors(form.nom) }}
                 </div>
             </div>

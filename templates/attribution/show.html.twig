@@ -6,7 +6,6 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <!-- improved design -->
             <div class="card card-modern">
                 <div class="card-header bg-primary text-white">
                     <h1 class="h3 mb-0">
@@ -95,12 +94,15 @@
                             <i class="fas fa-arrow-left me-2"></i>Retour à la liste
                         </a>
                         <div class="d-flex gap-2">
-                            <a href="{{ path('app_attribution_edit', {'id': attribution.id}) }}" class="btn btn-warning btn-add">
-                                <i class="fas fa-edit me-2"></i>Modifier
-                            </a>
-                            <button type="button" class="btn btn-danger btn-add" onclick="confirmDelete()">
-                                <i class="fas fa-trash me-2"></i>Supprimer
-                            </button>
+                            {# Seuls les admins peuvent modifier/supprimer #}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a href="{{ path('app_attribution_edit', {'id': attribution.id}) }}" class="btn btn-warning btn-add">
+                                    <i class="fas fa-edit me-2"></i>Modifier
+                                </a>
+                                <button type="button" class="btn btn-danger btn-add" onclick="confirmDelete()">
+                                    <i class="fas fa-trash me-2"></i>Supprimer
+                                </button>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -109,7 +111,8 @@
     </div>
 </div>
 
-<!-- Modal de confirmation -->
+{# Modal de confirmation - seulement pour les admins #}
+{% if is_granted('ROLE_ADMIN') %}
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -136,6 +139,7 @@ function confirmDelete() {
     modal.show();
 }
 </script>
+{% endif %}
 
 <style>
 .info-card {

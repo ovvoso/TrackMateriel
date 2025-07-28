@@ -41,6 +41,7 @@ security:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/reset-password, roles: PUBLIC_ACCESS }
+        - { path: ^/access-denied, roles: PUBLIC_ACCESS }
         - { path: ^/login-success, roles: IS_AUTHENTICATED_FULLY }
         
         # Routes d'administration
@@ -70,8 +71,8 @@ security:
         # Page d'accueil accessible aux utilisateurs connectés
         - { path: ^/home, roles: ROLE_USER }
         
-        # Redirection par défaut vers login pour les non-connectés
-        - { path: ^/, roles: PUBLIC_ACCESS }
+        # Route racine - nécessite une authentification
+        - { path: ^/, roles: ROLE_USER }
 
 when@test:
     security:

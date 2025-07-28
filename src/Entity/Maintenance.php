@@ -24,6 +24,10 @@ class Maintenance
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?Equipement $equipement = null;
 
+    #[ORM\ManyToOne(inversedBy: 'maintenances')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?User $utilisateur = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -61,6 +65,18 @@ class Maintenance
     public function setEquipement(?Equipement $equipement): static
     {
         $this->equipement = $equipement;
+
+        return $this;
+    }
+
+    public function getUtilisateur(): ?User
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?User $utilisateur): static
+    {
+        $this->utilisateur = $utilisateur;
 
         return $this;
     }

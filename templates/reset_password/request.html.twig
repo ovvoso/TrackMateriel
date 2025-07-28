@@ -14,18 +14,46 @@
                         <p class="text-muted">Réinitialiser votre mot de passe</p>
                     </div>
 
-                    <div class="alert alert-info">
-                        <small>
-                            <i class="bi bi-info-circle"></i>
-                            Pour la démonstration, utilisez ce lien direct :
-                            <br><a href="{{ path('app_reset_password', {'token': 'demo-token'}) }}" class="alert-link">Réinitialiser le mot de passe</a>
-                        </small>
-                    </div>
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                <i class="bi bi-envelope"></i> Adresse email
+                            </label>
+                            <input type="email" 
+                                   name="email" 
+                                   id="email" 
+                                   class="form-control" 
+                                   required 
+                                   placeholder="votre.email@exemple.com"
+                                   autofocus>
+                            <div class="form-text">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle"></i>
+                                    Saisissez l'adresse email associée à votre compte
+                                </small>
+                            </div>
+                        </div>
 
-                    <div class="text-center mt-3">
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-send"></i> Envoyer le lien de réinitialisation
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center">
                         <a href="{{ path('app_login') }}" class="btn btn-outline-primary">
                             <i class="bi bi-arrow-left"></i> Retour à la connexion
                         </a>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="alert alert-info">
+                        <small>
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Mode démonstration :</strong> Le lien de réinitialisation sera affiché directement sur cette page au lieu d'être envoyé par email.
+                        </small>
                     </div>
                 </div>
             </div>

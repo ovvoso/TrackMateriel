@@ -11,22 +11,10 @@
                     <div class="text-center mb-4">
                         <h2><i class="bi bi-shield-lock-fill text-success"></i></h2>
                         <h3>Nouveau mot de passe</h3>
-                        <p class="text-muted">Définir un nouveau mot de passe</p>
+                        <p class="text-muted">Définir un nouveau mot de passe pour <strong>{{ user.email }}</strong></p>
                     </div>
 
                     <form method="post">
-                        <div class="mb-3">
-                            <label for="email" class="form-label">
-                                <i class="bi bi-envelope"></i> Email
-                            </label>
-                            <input type="email" 
-                                   name="email" 
-                                   id="email" 
-                                   class="form-control" 
-                                   required 
-                                   placeholder="votre.email@exemple.com">
-                        </div>
-
                         <div class="mb-3">
                             <label for="password" class="form-label">
                                 <i class="bi bi-lock"></i> Nouveau mot de passe
@@ -37,6 +25,22 @@
                                    class="form-control" 
                                    required 
                                    placeholder="Nouveau mot de passe"
+                                   minlength="6">
+                            <div class="form-text">
+                                <small class="text-muted">Minimum 6 caractères</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">
+                                <i class="bi bi-lock-fill"></i> Confirmer le mot de passe
+                            </label>
+                            <input type="password" 
+                                   name="confirm_password" 
+                                   id="confirm_password" 
+                                   class="form-control" 
+                                   required 
+                                   placeholder="Confirmer le mot de passe"
                                    minlength="6">
                         </div>
 
@@ -57,4 +61,23 @@
         </div>
     </div>
 </div>
+
+<script>
+// Validation côté client pour la confirmation du mot de passe
+document.addEventListener('DOMContentLoaded', function() {
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+    
+    function validatePassword() {
+        if (password.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity('Les mots de passe ne correspondent pas');
+        } else {
+            confirmPassword.setCustomValidity('');
+        }
+    }
+    
+    password.addEventListener('change', validatePassword);
+    confirmPassword.addEventListener('keyup', validatePassword);
+});
+</script>
 {% endblock %}

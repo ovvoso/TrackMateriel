@@ -4,18 +4,19 @@
 
 {% block body %}
 <div class="container-fluid mt-4">
-    <!-- improved design -->
+    <!-- En-tête avec titre et bouton d'ajout -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="page-title">
-            <i class="fas fa-wrench icon-contextual"></i>Gestion des Maintenances
+            <i class="fas fa-tools icon-contextual"></i>Gestion des Maintenances
         </h1>
-        <a href="{{ path('app_maintenance_new') }}" class="btn btn-success btn-lg btn-add">
-            <i class="fas fa-plus me-2"></i>Nouvelle Maintenance
-        </a>
+        {% if is_granted('ROLE_USER') or is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_maintenance_new') }}" class="btn btn-success btn-lg btn-add">
+                <i class="fas fa-plus me-2"></i>Nouvelle Maintenance
+            </a>
+        {% endif %}
     </div>
 
     {% if maintenances|length > 0 %}
-        <!-- improved design -->
         <div class="card card-modern">
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -26,6 +27,7 @@
                                 <th><i class="fas fa-calendar icon-contextual"></i>Date</th>
                                 <th><i class="fas fa-sticky-note icon-contextual"></i>Observation</th>
                                 <th><i class="fas fa-desktop icon-contextual"></i>Équipement</th>
+                                {# <th><i class="fas fa-user icon-contextual"></i>Utilisateur</th> #}
                                 <th class="text-center"><i class="fas fa-cogs icon-contextual"></i>Actions</th>
                             </tr>
                         </thead>
@@ -33,10 +35,7 @@
                         {% for maintenance in maintenances %}
                             <tr>
                                 <td class="fw-bold">{{ maintenance.id }}</td>
-                                <td>
-                                    {# <i class="fas fa-clock icon-contextual text-muted"></i> #}
-                                    {{ maintenance.date ? maintenance.date|date('d/m/Y H:i') : 'Non définie' }}
-                                </td>
+                                <td>{{ maintenance.date ? maintenance.date|date('d/m/Y H:i') : 'Non définie' }}</td>
                                 <td>
                                     <div class="text-truncate" style="max-width: 200px;" title="{{ maintenance.observation }}">
                                         {{ maintenance.observation|length > 50 ? maintenance.observation[:50] ~ '...' : maintenance.observation }}
@@ -44,28 +43,41 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        {# <i class="fas fa-desktop icon-contextual text-primary"></i> #}
                                         <div>
                                             <div class="fw-semibold">{{ maintenance.equipement ? maintenance.equipement.nom : 'N/A' }}</div>
-                                            {# <small class="text-muted">{{ maintenance.equipement ? maintenance.equipement.type : '' }}</small> #}
+                                            {% if maintenance.equipement %}
+                                                <small class="text-muted">{{ maintenance.equipement.type }}</small>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </td>
+                                {# <td>
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <div class="fw-semibold">{{ maintenance.utilisateur ? maintenance.utilisateur.username : 'N/A' }}</div>
+                                            {% if maintenance.utilisateur %}
+                                                <small class="text-muted">{{ maintenance.utilisateur.email }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td> #}
                                 <td class="text-center">
-                                    <!-- improved design - boutons d'action avec icônes circulaires -->
                                     <div class="d-flex justify-content-center gap-2">
                                         <a href="{{ path('app_maintenance_show', {'id': maintenance.id}) }}" 
                                            class="btn-action btn-view" title="Voir les détails">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="{{ path('app_maintenance_edit', {'id': maintenance.id}) }}" 
-                                           class="btn-action btn-edit" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <button type="button" class="btn-action btn-delete" 
-                                                title="Supprimer" onclick="deleteMaintenance({{ maintenance.id }})">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+
+                                        {% if maintenance.utilisateur == app.user or is_granted('ROLE_ADMIN') %}
+                                            <a href="{{ path('app_maintenance_edit', {'id': maintenance.id}) }}" 
+                                               class="btn-action btn-edit" title="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn-action btn-delete" 
+                                                    title="Supprimer" onclick="deleteMaintenance({{ maintenance.id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
@@ -76,16 +88,17 @@
             </div>
         </div>
     {% else %}
-        <!-- improved design -->
         <div class="text-center py-5">
             <div class="mb-4">
                 <i class="fas fa-tools fa-4x text-muted"></i>
             </div>
             <h4 class="text-muted mb-3">Aucune maintenance trouvée</h4>
             <p class="text-muted mb-4">Commencez par créer votre première maintenance</p>
-            <a href="{{ path('app_maintenance_new') }}" class="btn btn-primary btn-add">
-                <i class="fas fa-plus me-2"></i>Créer une maintenance
-            </a>
+            {% if is_granted('ROLE_USER') or is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_maintenance_new') }}" class="btn btn-primary btn-add">
+                    <i class="fas fa-plus me-2"></i>Créer une maintenance
+                </a>
+            {% endif %}
         </div>
     {% endif %}
 </div>

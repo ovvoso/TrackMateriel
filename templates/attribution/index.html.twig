@@ -7,11 +7,18 @@
     <!-- improved design -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="page-title">
-            <i class="fas fa-user-cog icon-contextual"></i>Gestion des Attributions
+            <i class="fas fa-user-cog icon-contextual"></i>
+            {% if is_granted('ROLE_ADMIN') %}
+                Gestion des Attributions
+            {% else %}
+                Mes Attributions
+            {% endif %}
         </h1>
-        <a href="{{ path('app_attribution_new') }}" class="btn btn-success btn-lg btn-add">
-            <i class="fas fa-plus me-2"></i>Nouvelle Attribution
-        </a>
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_attribution_new') }}" class="btn btn-success btn-lg btn-add">
+                <i class="fas fa-plus me-2"></i>Nouvelle Attribution
+            </a>
+        {% endif %}
     </div>
 
     {% if attributions|length > 0 %}
@@ -55,18 +62,25 @@
                                 <td class="text-center">
                                     <!-- improved design - boutons d'action avec icônes circulaires -->
                                     <div class="d-flex justify-content-center gap-2">
-                                        <a href="{{ path('app_attribution_show', {'id': attribution.id}) }}" 
-                                           class="btn-action btn-view" title="Voir les détails">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ path('app_attribution_edit', {'id': attribution.id}) }}" 
-                                           class="btn-action btn-edit" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <button type="button" class="btn-action btn-delete" 
-                                                title="Supprimer" onclick="deleteAttribution({{ attribution.id }})">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                        {# Tous les utilisateurs peuvent voir les détails de leurs attributions #}
+                                        {% if is_granted('ROLE_ADMIN') or attribution.utilisateur == app.user %}
+                                            <a href="{{ path('app_attribution_show', {'id': attribution.id}) }}" 
+                                               class="btn-action btn-view" title="Voir les détails">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        {% endif %}
+                                        
+                                        {# Seuls les admins peuvent modifier/supprimer #}
+                                        {% if is_granted('ROLE_ADMIN') %}
+                                            <a href="{{ path('app_attribution_edit', {'id': attribution.id}) }}" 
+                                               class="btn-action btn-edit" title="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn-action btn-delete" 
+                                                    title="Supprimer" onclick="deleteAttribution({{ attribution.id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
@@ -82,16 +96,31 @@
             <div class="mb-4">
                 <i class="fas fa-user-slash fa-4x text-muted"></i>
             </div>
-            <h4 class="text-muted mb-3">Aucune attribution trouvée</h4>
-            <p class="text-muted mb-4">Commencez par créer votre première attribution</p>
-            <a href="{{ path('app_attribution_new') }}" class="btn btn-primary btn-add">
-                <i class="fas fa-plus me-2"></i>Créer une attribution
-            </a>
+            <h4 class="text-muted mb-3">
+                {% if is_granted('ROLE_ADMIN') %}
+                    Aucune attribution trouvée
+                {% else %}
+                    Aucune attribution trouvée pour votre compte
+                {% endif %}
+            </h4>
+            <p class="text-muted mb-4">
+                {% if is_granted('ROLE_ADMIN') %}
+                    Commencez par créer votre première attribution
+                {% else %}
+                    Aucun équipement ne vous est actuellement attribué
+                {% endif %}
+            </p>
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_attribution_new') }}" class="btn btn-primary btn-add">
+                    <i class="fas fa-plus me-2"></i>Créer une attribution
+                </a>
+            {% endif %}
         </div>
     {% endif %}
 </div>
 
-<!-- Modal de confirmation de suppression -->
+{# Modal de confirmation de suppression - seulement pour les admins #}
+{% if is_granted('ROLE_ADMIN') %}
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -142,4 +171,5 @@ function deleteAttribution(id) {
     });
 }
 </script>
+{% endif %}
 {% endblock %}
