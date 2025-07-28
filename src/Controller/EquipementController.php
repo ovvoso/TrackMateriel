@@ -33,6 +33,7 @@ final class EquipementController extends AbstractController
             $entityManager->persist($equipement);
             $entityManager->flush();
 
+            $this->addFlash('success', 'Équipement créé avec succès.');
             return $this->redirectToRoute('app_equipement_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -59,6 +60,7 @@ final class EquipementController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
+            $this->addFlash('success', 'Équipement modifié avec succès.');
             return $this->redirectToRoute('app_equipement_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -72,8 +74,21 @@ final class EquipementController extends AbstractController
     public function delete(Request $request, Equipement $equipement, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$equipement->getId(), $request->getPayload()->getString('_token'))) {
+            // Vérifier s'il y a des attributions ou maintenances liées
+            $attributionsCount = $equipement->getAttributions()->count();
+            $maintenancesCount = $equipement->getMaintenances()->count();
+            
+            if ($attributionsCount > 0 || $maintenancesCount > 0) {
+                $this->addFlash('warning', 'L\'équipement "' . $equipement->getNom() . '" a été supprimé avec ' . 
+                    $attributionsCount . ' attribution(s) et ' . $maintenancesCount . ' maintenance(s) associée(s).');
+            } else {
+                $this->addFlash('success', 'Équipement supprimé avec succès.');
+            }
+            
             $entityManager->remove($equipement);
             $entityManager->flush();
+        } else {
+            $this->addFlash('error', 'Token CSRF invalide.');
         }
 
         return $this->redirectToRoute('app_equipement_index', [], Response::HTTP_SEE_OTHER);

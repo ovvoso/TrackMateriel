@@ -1,4 +1,51 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': true}}) }}
+<!-- improved design -->
+<div class="card card-modern">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            <i class="fas fa-box icon-contextual"></i>Informations de l'équipement
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <div class="form-group">
+                    {{ form_label(form.nom, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                    <div class="form-text">
+                        <i class="fas fa-info-circle icon-contextual"></i>
+                        Donnez un nom unique et descriptif à votre équipement
+                    </div>
+                    {{ form_errors(form.nom) }}
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    {{ form_label(form.type, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(form.type, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_errors(form.type) }}
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    {{ form_label(form.etat, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(form.etat, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_errors(form.etat) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer bg-light">
+        <div class="d-flex justify-content-between">
+            <a href="{{ path('app_equipement_index') }}" class="btn btn-secondary btn-add">
+                <i class="fas fa-arrow-left me-2"></i>Annuler
+            </a>
+            <button type="submit" class="btn btn-primary btn-add">
+                <i class="fas fa-save me-2"></i>{{ button_label|default('Enregistrer') }}
+            </button>
+        </div>
+    </div>
+</div>
 {{ form_end(form) }}

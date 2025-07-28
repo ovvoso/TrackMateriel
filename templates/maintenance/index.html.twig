@@ -1,39 +1,128 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Maintenance index{% endblock %}
+{% block title %}Gestion des Maintenances{% endblock %}
 
 {% block body %}
-    <h1>Maintenance index</h1>
+<div class="container-fluid mt-4">
+    <!-- improved design -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title">
+            <i class="fas fa-wrench icon-contextual"></i>Gestion des Maintenances
+        </h1>
+        <a href="{{ path('app_maintenance_new') }}" class="btn btn-success btn-lg btn-add">
+            <i class="fas fa-plus me-2"></i>Nouvelle Maintenance
+        </a>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Date</th>
-                <th>Observation</th>
-                <th>Équipement</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for maintenance in maintenances %}
-            <tr>
-                <td>{{ maintenance.id }}</td>
-                <td>{{ maintenance.date ? maintenance.date|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ maintenance.observation }}</td>
-                <td>{{ maintenance.equipement ? maintenance.equipement.nom : '' }}</td>
-                <td>
-                    <a href="{{ path('app_maintenance_show', {'id': maintenance.id}) }}">show</a>
-                    <a href="{{ path('app_maintenance_edit', {'id': maintenance.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    {% if maintenances|length > 0 %}
+        <!-- improved design -->
+        <div class="card card-modern">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 table-modern">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-hashtag icon-contextual"></i>ID</th>
+                                <th><i class="fas fa-calendar icon-contextual"></i>Date</th>
+                                <th><i class="fas fa-sticky-note icon-contextual"></i>Observation</th>
+                                <th><i class="fas fa-desktop icon-contextual"></i>Équipement</th>
+                                <th class="text-center"><i class="fas fa-cogs icon-contextual"></i>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for maintenance in maintenances %}
+                            <tr>
+                                <td class="fw-bold">{{ maintenance.id }}</td>
+                                <td>
+                                    {# <i class="fas fa-clock icon-contextual text-muted"></i> #}
+                                    {{ maintenance.date ? maintenance.date|date('d/m/Y H:i') : 'Non définie' }}
+                                </td>
+                                <td>
+                                    <div class="text-truncate" style="max-width: 200px;" title="{{ maintenance.observation }}">
+                                        {{ maintenance.observation|length > 50 ? maintenance.observation[:50] ~ '...' : maintenance.observation }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {# <i class="fas fa-desktop icon-contextual text-primary"></i> #}
+                                        <div>
+                                            <div class="fw-semibold">{{ maintenance.equipement ? maintenance.equipement.nom : 'N/A' }}</div>
+                                            {# <small class="text-muted">{{ maintenance.equipement ? maintenance.equipement.type : '' }}</small> #}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <!-- improved design - boutons d'action avec icônes circulaires -->
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{{ path('app_maintenance_show', {'id': maintenance.id}) }}" 
+                                           class="btn-action btn-view" title="Voir les détails">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_maintenance_edit', {'id': maintenance.id}) }}" 
+                                           class="btn-action btn-edit" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn-action btn-delete" 
+                                                title="Supprimer" onclick="deleteMaintenance({{ maintenance.id }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- improved design -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-tools fa-4x text-muted"></i>
+            </div>
+            <h4 class="text-muted mb-3">Aucune maintenance trouvée</h4>
+            <p class="text-muted mb-4">Commencez par créer votre première maintenance</p>
+            <a href="{{ path('app_maintenance_new') }}" class="btn btn-primary btn-add">
+                <i class="fas fa-plus me-2"></i>Créer une maintenance
+            </a>
+        </div>
+    {% endif %}
+</div>
 
-    <a href="{{ path('app_maintenance_new') }}">Create new</a>
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer cette maintenance ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    <input type="hidden" name="_token" id="deleteToken">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function deleteMaintenance(id) {
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const form = document.getElementById('deleteForm');
+    form.action = '{{ path('app_maintenance_delete', {'id': 'ID_PLACEHOLDER'}) }}'.replace('ID_PLACEHOLDER', id);
+    document.getElementById('deleteToken').value = '{{ csrf_token('delete') }}' + id;
+    modal.show();
+}
+</script>
 {% endblock %}

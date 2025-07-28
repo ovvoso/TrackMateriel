@@ -21,6 +21,7 @@ class Maintenance
     private ?string $observation = null;
 
     #[ORM\ManyToOne(inversedBy: 'maintenances')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?Equipement $equipement = null;
 
     public function getId(): ?int

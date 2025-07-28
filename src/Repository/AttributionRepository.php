@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Attribution;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -40,4 +41,49 @@ class AttributionRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * Find attribution with all related entities loaded
+     */
+    public function findWithRelations(int $id): ?Attribution
+    {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.equipement', 'e')
+            ->leftJoin('a.utilisateur', 'u')
+            ->addSelect('e', 'u')
+            ->where('a.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Find all attributions with related entities
+     */
+    public function findAllWithRelations(): array
+    {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.equipement', 'e')
+            ->leftJoin('a.utilisateur', 'u')
+            ->addSelect('e', 'u')
+            ->orderBy('a.dateAttribution', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find attributions for a specific user
+     */
+    public function findByUserWithRelations(User $user): array
+    {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.equipement', 'e')
+            ->leftJoin('a.utilisateur', 'u')
+            ->addSelect('e', 'u')
+            ->where('a.utilisateur = :user')
+            ->setParameter('user', $user)
+            ->orderBy('a.dateAttribution', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -17,9 +17,11 @@ class Attribution
     private ?\DateTimeImmutable $dateAttribution = null;
 
     #[ORM\ManyToOne(inversedBy: 'attributions')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?Equipement $equipement = null;
 
     #[ORM\ManyToOne(inversedBy: 'attributions')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?User $utilisateur = null;
 
     public function getId(): ?int

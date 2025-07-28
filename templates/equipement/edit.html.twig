@@ -1,13 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Equipement{% endblock %}
+{% block title %}Modifier Équipement{% endblock %}
 
 {% block body %}
-    <h1>Edit Equipement</h1>
-
-    {{ include('equipement/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('app_equipement_index') }}">back to list</a>
-
-    {{ include('equipement/_delete_form.html.twig') }}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center mb-4">
+                <i class="fas fa-edit fa-2x text-warning me-3"></i>
+                <div>
+                    <h1 class="h2 mb-0">Modifier l'équipement</h1>
+                    <p class="text-muted mb-0">{{ equipement.nom }} - {{ equipement.type }}</p>
+                </div>
+            </div>
+            {{ include('equipement/_form.html.twig', {'button_label': 'Mettre à jour'}) }} 
+        </div>
+    </div>
+</div>
 {% endblock %}

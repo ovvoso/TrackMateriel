@@ -1,0 +1,173 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration - Détails de l'Attribution{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- improved design -->
+            <div class="card card-modern">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-user-cog icon-contextual"></i>Administration - Détails de l'Attribution
+                    </h1>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="info-card">
+                                <div class="info-header">
+                                    <i class="fas fa-calendar-alt text-primary"></i>
+                                    <span class="text-muted small">Date d'attribution</span>
+                                </div>
+                                <div class="info-content">
+                                    {{ attribution.dateAttribution ? attribution.dateAttribution|date('d/m/Y H:i:s') : 'Non définie' }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="info-card">
+                                <div class="info-header">
+                                    <i class="fas fa-user text-success"></i>
+                                    <span class="text-muted small">Utilisateur</span>
+                                </div>
+                                <div class="info-content">
+                                    {{ attribution.utilisateur ? attribution.utilisateur.username : 'Non assigné' }}
+                                </div>
+                                {% if attribution.utilisateur and attribution.utilisateur.email %}
+                                    <div class="text-muted small mt-1">
+                                        <i class="fas fa-envelope icon-contextual"></i>{{ attribution.utilisateur.email }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-desktop text-primary icon-contextual"></i>Informations de l'Équipement
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="info-card">
+                                    <div class="info-header">
+                                        <i class="fas fa-tag text-info"></i>
+                                        <span class="text-muted small">Nom</span>
+                                    </div>
+                                    <div class="info-content">
+                                        {{ attribution.equipement ? attribution.equipement.nom : 'N/A' }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="info-card">
+                                    <div class="info-header">
+                                        <i class="fas fa-layer-group text-info"></i>
+                                        <span class="text-muted small">Type</span>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="badge bg-info badge-etat">
+                                            {{ attribution.equipement ? attribution.equipement.type : 'N/A' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="info-card">
+                                    <div class="info-header">
+                                        <i class="fas fa-check-circle text-warning"></i>
+                                        <span class="text-muted small">État</span>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="badge {% if attribution.equipement and attribution.equipement.etat == 'Bon' %}bg-success{% elseif attribution.equipement and attribution.equipement.etat == 'Moyen' %}bg-warning text-dark{% else %}bg-danger{% endif %} badge-etat">
+                                            {{ attribution.equipement ? attribution.equipement.etat : 'N/A' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <a href="{{ path('admin_attribution_index') }}" class="btn btn-outline-secondary btn-add">
+                            <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                        </a>
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('admin_attribution_edit', {'id': attribution.id}) }}" class="btn btn-warning btn-add">
+                                <i class="fas fa-edit me-2"></i>Modifier
+                            </a>
+                            <button type="button" class="btn btn-danger btn-add" onclick="confirmDelete()">
+                                <i class="fas fa-trash me-2"></i>Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer cette attribution ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" action="{{ path('admin_attribution_delete', {'id': attribution.id}) }}" style="display: inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ attribution.id) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete() {
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+</script>
+
+<style>
+.info-card {
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--primary-color);
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.info-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.info-content {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #495057;
+}
+</style>
+{% endblock %} 

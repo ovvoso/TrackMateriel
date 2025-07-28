@@ -22,7 +22,21 @@ class UserController extends AbstractController
     public function mesAttributions(AttributionRepository $attributionRepository): Response
     {
         $user = $this->getUser();
-        $attributions = $attributionRepository->findBy(['utilisateur' => $user]);
+        
+        if (!$user) {
+            throw $this->createAccessDeniedException('User not authenticated');
+        }
+
+        // Use QueryBuilder for better control and to ensure entities are properly loaded
+        $attributions = $attributionRepository->createQueryBuilder('a')
+            ->leftJoin('a.equipement', 'e')
+            ->leftJoin('a.utilisateur', 'u')
+            ->addSelect('e', 'u')
+            ->where('a.utilisateur = :user')
+            ->setParameter('user', $user)
+            ->orderBy('a.dateAttribution', 'DESC')
+            ->getQuery()
+            ->getResult();
 
         return $this->render('user/attributions.html.twig', [
             'attributions' => $attributions,

@@ -27,13 +27,13 @@ class Equipement
     /**
      * @var Collection<int, Attribution>
      */
-    #[ORM\OneToMany(targetEntity: Attribution::class, mappedBy: 'equipement')]
+    #[ORM\OneToMany(targetEntity: Attribution::class, mappedBy: 'equipement', cascade: ['remove'])]
     private Collection $attributions;
 
     /**
      * @var Collection<int, Maintenance>
      */
-    #[ORM\OneToMany(targetEntity: Maintenance::class, mappedBy: 'equipement')]
+    #[ORM\OneToMany(targetEntity: Maintenance::class, mappedBy: 'equipement', cascade: ['remove'])]
     private Collection $maintenances;
 
     public function __construct()
