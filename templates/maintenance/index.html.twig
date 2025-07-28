@@ -11,6 +11,7 @@
                 <th>Id</th>
                 <th>Date</th>
                 <th>Observation</th>
+                <th>Équipement</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -20,6 +21,7 @@
                 <td>{{ maintenance.id }}</td>
                 <td>{{ maintenance.date ? maintenance.date|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ maintenance.observation }}</td>
+                <td>{{ maintenance.equipement ? maintenance.equipement.nom : '' }}</td>
                 <td>
                     <a href="{{ path('app_maintenance_show', {'id': maintenance.id}) }}">show</a>
                     <a href="{{ path('app_maintenance_edit', {'id': maintenance.id}) }}">edit</a>

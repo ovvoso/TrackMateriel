@@ -19,6 +19,10 @@
                 <th>Observation</th>
                 <td>{{ maintenance.observation }}</td>
             </tr>
+            <tr>
+                <th>Équipement</th>
+                <td>{{ maintenance.equipement ? maintenance.equipement.nom : '' }}</td>
+            </tr>
         </tbody>
     </table>
 
