@@ -102,6 +102,9 @@ Les contributions sont les bienvenues ! Voici comment vous pouvez contribuer :
 
 ## 📸 Captures d'écran
 
+### Page d'inscription
+![Login](screenshots/inscription.png)
+
 ### Page de connexion
 ![Login](screenshots/login.png)
 
