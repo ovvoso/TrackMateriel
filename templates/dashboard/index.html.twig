@@ -1,0 +1,77 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <div>
+            <p class="page-eyebrow">{{ 'now'|format_date('full', locale: 'fr')|capitalize }}</p>
+            <h1 class="page-title">Bonjour, {{ app.user.firstName }}</h1>
+            <p class="page-lead">Votre espace de gestion du parc matériel. Les indicateurs s'afficheront ici dès que l'inventaire sera renseigné.</p>
+        </div>
+    </header>
+
+    <div class="grid-2">
+        <section class="card" aria-labelledby="mise-en-route">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title" id="mise-en-route">Mise en route</h2>
+                    <p class="card-subtitle">Les étapes pour rendre votre parc opérationnel.</p>
+                </div>
+                <span class="badge">0 sur 4</span>
+            </div>
+            <ol class="steps">
+                <li class="step">
+                    <div>
+                        <p class="step-title">Décrire les emplacements</p>
+                        <p class="step-text">Sites, bâtiments et salles où se trouve le matériel.</p>
+                    </div>
+                    <span class="badge">Bientôt</span>
+                </li>
+                <li class="step">
+                    <div>
+                        <p class="step-title">Constituer l'inventaire</p>
+                        <p class="step-text">Saisie ou import CSV, avec un code d'inventaire par équipement.</p>
+                    </div>
+                    <span class="badge">Bientôt</span>
+                </li>
+                <li class="step">
+                    <div>
+                        <p class="step-title">Imprimer les étiquettes</p>
+                        <p class="step-text">Un QR code par équipement pour le retrouver et signaler une panne.</p>
+                    </div>
+                    <span class="badge">Bientôt</span>
+                </li>
+                <li class="step">
+                    <div>
+                        <p class="step-title">Inviter l'équipe</p>
+                        <p class="step-text">Gestionnaires, techniciens et enseignants, chacun avec son profil.</p>
+                    </div>
+                    <span class="badge">Bientôt</span>
+                </li>
+            </ol>
+        </section>
+
+        <section class="card" aria-labelledby="mon-compte">
+            <div class="card-header">
+                <h2 class="card-title" id="mon-compte">Mon compte</h2>
+            </div>
+            <div class="card-body">
+                <dl class="meta-list">
+                    <div>
+                        <dt>Adresse e-mail</dt>
+                        <dd>{{ app.user.email }}</dd>
+                    </div>
+                    <div>
+                        <dt>Profil</dt>
+                        <dd><span class="badge badge-accent">{{ app.user.role.label }}</span></dd>
+                    </div>
+                    <div>
+                        <dt>Membre depuis</dt>
+                        <dd>{{ app.user.createdAt|format_date('long', locale: 'fr') }}</dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+    </div>
+{% endblock %}

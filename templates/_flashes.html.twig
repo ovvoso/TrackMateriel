@@ -1,0 +1,14 @@
+{% set flash_icons = {success: 'lucide:circle-check', danger: 'lucide:circle-alert', info: 'lucide:info'} %}
+{% set flashes = app.flashes %}
+{% if flashes is not empty %}
+    <div class="flashes">
+        {% for type, messages in flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type }}" role="{{ type == 'danger' ? 'alert' : 'status' }}">
+                    {{ ux_icon(flash_icons[type] ?? 'lucide:info', {'aria-hidden': 'true'}) }}
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endif %}

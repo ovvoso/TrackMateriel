@@ -1,0 +1,158 @@
+/*
+ * Jetons du design system TrackMateriel.
+ * Toutes les couleurs de l'interface passent par ces variables : les composants
+ * ne contiennent jamais de valeur en dur, ce qui garantit le mode sombre.
+ */
+
+@font-face {
+    font-family: 'IBM Plex Sans';
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/ibm-plex-sans-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'IBM Plex Sans';
+    font-weight: 500;
+    font-display: swap;
+    src: url('../fonts/ibm-plex-sans-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'IBM Plex Sans';
+    font-weight: 600;
+    font-display: swap;
+    src: url('../fonts/ibm-plex-sans-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'IBM Plex Mono';
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'IBM Plex Mono';
+    font-weight: 500;
+    font-display: swap;
+    src: url('../fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+}
+
+:root {
+    color-scheme: light;
+
+    /* Typographie : échelle modulaire, corps à 16 px pour la lisibilité */
+    --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
+    --text-xs: 0.75rem;   /* 12 */
+    --text-sm: 0.875rem;  /* 14 */
+    --text-md: 1rem;      /* 16 */
+    --text-lg: 1.125rem;  /* 18 */
+    --text-xl: 1.375rem;  /* 22 */
+    --text-2xl: 1.75rem;  /* 28 */
+    --leading-tight: 1.25;
+    --leading-normal: 1.5;
+
+    /* Espacements : grille de 4 px */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-full: 999px;
+
+    --sidebar-width: 15.5rem;
+    --content-max: 72rem;
+    --transition: 140ms cubic-bezier(0.2, 0, 0, 1);
+
+    /* Neutres légèrement chauds (pierre) */
+    --gray-0: #ffffff;
+    --gray-25: #fbfbfa;
+    --gray-50: #f6f6f4;
+    --gray-100: #eeedea;
+    --gray-200: #e1dfdb;
+    --gray-300: #c9c6c0;
+    --gray-400: #a09c95;
+    --gray-500: #78746e;
+    --gray-600: #5a5752;
+    --gray-700: #42403c;
+    --gray-800: #2c2b28;
+    --gray-900: #1d1c1a;
+    --gray-950: #131211;
+
+    /* Accent : vert sapin, contraste 6,2:1 sur blanc (WCAG AA) */
+    --brand-50: #ecf7f4;
+    --brand-100: #d2ede6;
+    --brand-500: #13897a;
+    --brand-600: #0b6e63;
+    --brand-700: #08584f;
+    --brand-800: #06443d;
+
+    /* Rôles sémantiques */
+    --bg: var(--gray-25);
+    --bg-subtle: var(--gray-50);
+    --surface: var(--gray-0);
+    --surface-hover: var(--gray-50);
+    --border: var(--gray-200);
+    --border-strong: var(--gray-300);
+    --text: var(--gray-900);
+    --text-muted: var(--gray-600);
+    --text-subtle: var(--gray-500);
+    --text-on-accent: #ffffff;
+
+    --accent: var(--brand-600);
+    --accent-hover: var(--brand-700);
+    --accent-soft: var(--brand-50);
+    --accent-soft-text: var(--brand-700);
+    --focus-ring: 0 0 0 3px color-mix(in srgb, var(--brand-500) 40%, transparent);
+
+    --success: #1e7a3c;
+    --success-soft: #e8f5ec;
+    --warning: #9a5a06;
+    --warning-soft: #fdf3e2;
+    --danger: #b42318;
+    --danger-soft: #fdecea;
+    --info: #1d5fc4;
+    --info-soft: #eaf1fc;
+
+    --shadow-sm: 0 1px 2px rgb(19 18 17 / 0.06);
+    --shadow-md: 0 1px 2px rgb(19 18 17 / 0.06), 0 4px 12px rgb(19 18 17 / 0.06);
+    --shadow-lg: 0 12px 32px rgb(19 18 17 / 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+        color-scheme: dark;
+        --bg: var(--gray-950);
+        --bg-subtle: #191816;
+        --surface: #1b1a18;
+        --surface-hover: #242320;
+        --border: #2f2d2a;
+        --border-strong: #403e3a;
+        --text: #f1f0ed;
+        --text-muted: #b3afa8;
+        --text-subtle: #8c8881;
+        --accent: #3fb8a6;
+        --accent-hover: #63c9b9;
+        --accent-soft: rgb(63 184 166 / 0.12);
+        --accent-soft-text: #7fd6c7;
+        --text-on-accent: #06221e;
+        --success: #5cc985;
+        --success-soft: rgb(92 201 133 / 0.12);
+        --warning: #f0b45a;
+        --warning-soft: rgb(240 180 90 / 0.12);
+        --danger: #f2796f;
+        --danger-soft: rgb(242 121 111 / 0.12);
+        --info: #7aa9f0;
+        --info-soft: rgb(122 169 240 / 0.12);
+        --shadow-sm: none;
+        --shadow-md: 0 0 0 1px var(--border);
+        --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.5);
+    }
+}

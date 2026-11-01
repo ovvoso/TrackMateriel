@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{# Modules de l'application. « route » vide = module pas encore livré. #}
+{% set navigation = [
+    {heading: null, items: [
+        {label: 'Tableau de bord', icon: 'lucide:layout-dashboard', route: 'app_dashboard'},
+    ]},
+    {heading: 'Parc', items: [
+        {label: 'Inventaire', icon: 'lucide:package', route: null},
+        {label: 'Prêts', icon: 'lucide:arrow-left-right', route: null},
+        {label: 'Réservations', icon: 'lucide:calendar-days', route: null},
+        {label: 'Maintenance', icon: 'lucide:wrench', route: null},
+    ]},
+    {heading: 'Organisation', items: [
+        {label: 'Emplacements', icon: 'lucide:map-pin', route: null},
+        {label: 'Utilisateurs', icon: 'lucide:users', route: null, role: 'ROLE_ADMIN'},
+    ]},
+] %}
+
+{% block body %}
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+
+    <div class="shell" data-controller="sidebar" data-action="keydown@window->sidebar#closeOnEscape">
+        <aside class="sidebar" id="navigation" aria-label="Navigation principale">
+            <div class="sidebar-brand">
+                <twig:Logo />
+            </div>
+
+            <nav class="nav">
+                {% for section in navigation %}
+                    <div class="nav-section">
+                        {% if section.heading %}
+                            <p class="nav-heading">{{ section.heading }}</p>
+                        {% endif %}
+                        {% for item in section.items|filter(i => i.role is not defined or is_granted(i.role)) %}
+                            {% if item.route %}
+                                <a class="nav-link" href="{{ path(item.route) }}" {{ app.current_route == item.route ? 'aria-current="page"' }}>
+                                    {{ ux_icon(item.icon, {'aria-hidden': 'true'}) }}
+                                    {{ item.label }}
+                                </a>
+                            {% else %}
+                                <span class="nav-link is-soon" aria-disabled="true">
+                                    {{ ux_icon(item.icon, {'aria-hidden': 'true'}) }}
+                                    {{ item.label }}
+                                    <span class="soon">Bientôt</span>
+                                </span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </nav>
+
+            <div class="sidebar-footer">
+                <span class="avatar" aria-hidden="true">{{ app.user.initials }}</span>
+                <div class="sidebar-user">
+                    <p class="sidebar-user-name">{{ app.user.fullName }}</p>
+                    <p class="sidebar-user-role">{{ app.user.role.label }}</p>
+                </div>
+                <form method="post" action="{{ path('app_logout') }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" data-controller="csrf-protection">
+                    <button type="submit" class="icon-btn" title="Se déconnecter">
+                        {{ ux_icon('lucide:log-out', {'aria-hidden': 'true'}) }}
+                        <span class="visually-hidden">Se déconnecter</span>
+                    </button>
+                </form>
+            </div>
+        </aside>
+        <div class="scrim" data-action="click->sidebar#close"></div>
+
+        <div class="main">
+            <header class="topbar">
+                <button type="button" class="icon-btn" aria-controls="navigation" aria-expanded="false"
+                        data-sidebar-target="toggle" data-action="sidebar#open">
+                    {{ ux_icon('lucide:menu', {'aria-hidden': 'true'}) }}
+                    <span class="visually-hidden">Ouvrir la navigation</span>
+                </button>
+                <twig:Logo />
+            </header>
+
+            <main class="page" id="contenu">
+                {{ include('_flashes.html.twig') }}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+{% endblock %}
