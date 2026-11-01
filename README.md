@@ -9,7 +9,8 @@ Gestion du parc matériel des établissements d'enseignement : inventaire, prêt
 | Module | État |
 |---|---|
 | Comptes, profils et connexion sécurisée | ✅ Livré |
-| Inventaire (codes d'inventaire, emplacements, cycle de vie) | 🔜 En cours |
+| Inventaire : codes d'inventaire, emplacements, catégories, cycle de vie, historique, export CSV | ✅ Livré |
+| Tableau de bord : état du parc, activité récente, garanties à échéance | ✅ Livré |
 | Prêts et affectations, avec retours et retards | 🔜 |
 | Réservations de matériel pour les cours | 🔜 |
 | Tickets de maintenance et maintenance préventive | 🔜 |
@@ -43,12 +44,21 @@ Le code est organisé par domaine métier plutôt que par type technique :
 src/
 ├── Identity/      Comptes, profils, connexion
 │   ├── Entity/  Enum/  Repository/  Security/  Controller/  Command/  Factory/
-├── Shared/        Briques transverses : en-têtes de sécurité, CSP, tableau de bord
+├── Inventory/     Emplacements, catégories, équipements, cycle de vie et journal
+│   ├── Entity/  Enum/  Form/  Service/  Security/  Validator/  EventListener/  …
+├── Shared/        Briques transverses : en-têtes de sécurité, CSP, pagination, tableau de bord
 ├── Story/         Jeu de données de démonstration (dev et test)
 └── Migrations/
 ```
 
-Chaque nouveau domaine (Inventaire, Prêts, Réservations, Maintenance) suit la même structure et déclare sa propre cartographie Doctrine.
+Chaque domaine suit la même structure et déclare sa propre cartographie Doctrine.
+
+Quelques choix de conception :
+
+- **Cycle de vie par machine à états** (composant Workflow) : disponible, en service, en maintenance, hors service, réformé. Chaque transition est réservée à un profil (le technicien gère la maintenance, le gestionnaire le reste) et l'interface n'affiche que les actions permises.
+- **Journal en ajout seul** : création, déplacement, modification et changement d'état sont tracés avec leur auteur. Un équipement n'est jamais supprimé, il est réformé.
+- **Codes d'inventaire** au format `INV-2026-00417`, tirés d'une séquence PostgreSQL pour éviter tout doublon.
+- **Formulaires sur objets de saisie** : l'entité reste toujours valide et n'est modifiée qu'après validation.
 
 ## Sécurité
 

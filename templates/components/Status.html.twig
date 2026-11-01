@@ -1,0 +1,2 @@
+{% props status, large = false %}
+<span {{ attributes.defaults({class: 'status status-' ~ status.tone ~ (large ? ' is-large')}) }}>{{ status.label }}</span>

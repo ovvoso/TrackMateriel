@@ -1,18 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{# Modules de l'application. « route » vide = module pas encore livré. #}
+{# Modules de l'application. « route » vide = module pas encore livré ;
+   « section » = préfixe des routes qui rendent l'entrée active. #}
 {% set navigation = [
     {heading: null, items: [
-        {label: 'Tableau de bord', icon: 'lucide:layout-dashboard', route: 'app_dashboard'},
+        {label: 'Tableau de bord', icon: 'lucide:layout-dashboard', route: 'app_dashboard', section: 'app_dashboard'},
     ]},
     {heading: 'Parc', items: [
-        {label: 'Inventaire', icon: 'lucide:package', route: null},
+        {label: 'Inventaire', icon: 'lucide:package', route: 'app_asset_index', section: 'app_asset'},
         {label: 'Prêts', icon: 'lucide:arrow-left-right', route: null},
         {label: 'Réservations', icon: 'lucide:calendar-days', route: null},
         {label: 'Maintenance', icon: 'lucide:wrench', route: null},
     ]},
     {heading: 'Organisation', items: [
-        {label: 'Emplacements', icon: 'lucide:map-pin', route: null},
+        {label: 'Emplacements', icon: 'lucide:map-pin', route: 'app_location_index', section: 'app_location'},
+        {label: 'Catégories', icon: 'lucide:tags', route: 'app_category_index', section: 'app_category', role: 'INVENTORY_MANAGE'},
         {label: 'Utilisateurs', icon: 'lucide:users', route: null, role: 'ROLE_ADMIN'},
     ]},
 ] %}
@@ -34,7 +36,7 @@
                         {% endif %}
                         {% for item in section.items|filter(i => i.role is not defined or is_granted(i.role)) %}
                             {% if item.route %}
-                                <a class="nav-link" href="{{ path(item.route) }}" {{ app.current_route == item.route ? 'aria-current="page"' }}>
+                                <a class="nav-link" href="{{ path(item.route) }}" {{ app.current_route starts with item.section ? 'aria-current="page"' }}>
                                     {{ ux_icon(item.icon, {'aria-hidden': 'true'}) }}
                                     {{ item.label }}
                                 </a>

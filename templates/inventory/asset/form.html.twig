@@ -1,0 +1,51 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}{{ asset ? 'Modifier ' ~ asset.code : 'Nouvel équipement' }}{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <div>
+            <p class="page-eyebrow">
+                <a href="{{ path('app_asset_index') }}">Inventaire</a>
+                {% if asset %} · <a class="code" href="{{ path('app_asset_show', {code: asset.code}) }}">{{ asset.code }}</a>{% endif %}
+            </p>
+            <h1 class="page-title">{{ asset ? asset.name : 'Nouvel équipement' }}</h1>
+            {% if not asset %}
+                <p class="page-lead">Le code d’inventaire est attribué automatiquement à l’enregistrement.</p>
+            {% endif %}
+        </div>
+    </header>
+
+    {{ form_start(form, {attr: {class: 'card form-wide', novalidate: 'novalidate'}}) }}
+        <section class="form-section">
+            <h2 class="form-section-title">Identification</h2>
+            <p class="form-section-lead">Ce qui permet de reconnaître l’équipement.</p>
+            <div class="form-grid">
+                {{ form_row(form.name, {row_attr: {class: 'span-2'}}) }}
+                {{ form_row(form.category) }}
+                {{ form_row(form.condition) }}
+                {{ form_row(form.brand) }}
+                {{ form_row(form.model) }}
+                {{ form_row(form.serialNumber) }}
+                {{ form_row(form.location) }}
+            </div>
+        </section>
+
+        <section class="form-section">
+            <h2 class="form-section-title">Achat et garantie</h2>
+            <p class="form-section-lead">Visible uniquement par les gestionnaires de parc.</p>
+            <div class="form-grid">
+                {{ form_row(form.purchasedAt) }}
+                {{ form_row(form.purchasePrice) }}
+                {{ form_row(form.warrantyEndsAt) }}
+                {{ form_row(form.supplier) }}
+                {{ form_row(form.notes, {row_attr: {class: 'span-2'}}) }}
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <a class="btn btn-ghost" href="{{ asset ? path('app_asset_show', {code: asset.code}) : path('app_asset_index') }}">Annuler</a>
+            <button class="btn btn-primary" type="submit">{{ asset ? 'Enregistrer' : 'Ajouter à l’inventaire' }}</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

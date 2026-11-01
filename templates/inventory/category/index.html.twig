@@ -1,0 +1,59 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}Catégories{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <div>
+            <h1 class="page-title">Catégories</h1>
+            <p class="page-lead">Les familles de matériel utilisées pour classer l’inventaire.</p>
+        </div>
+        <a class="btn btn-primary" href="{{ path('app_category_new') }}">
+            {{ ux_icon('lucide:plus', {'aria-hidden': 'true'}) }} Nouvelle catégorie
+        </a>
+    </header>
+
+    <section class="card">
+        {% if rows is empty %}
+            <twig:EmptyState icon="lucide:tags" title="Aucune catégorie" text="Créez des catégories (ordinateurs, vidéoprojecteurs, tablettes…) avant d’ajouter du matériel.">
+                <a class="btn btn-primary" href="{{ path('app_category_new') }}">{{ ux_icon('lucide:plus', {'aria-hidden': 'true'}) }} Nouvelle catégorie</a>
+            </twig:EmptyState>
+        {% else %}
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Catégorie</th>
+                            <th scope="col" class="num">Équipements</th>
+                            <th scope="col"><span class="visually-hidden">Actions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                            {% set category = row.category %}
+                            <tr>
+                                <td>
+                                    <a class="cell-title" href="{{ path('app_asset_index', {categorie: category.id}) }}">{{ category.name }}</a>
+                                    {% if category.description %}<div class="cell-sub">{{ category.description }}</div>{% endif %}
+                                </td>
+                                <td class="num">{{ row.total }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a class="btn btn-ghost btn-sm" href="{{ path('app_category_edit', {id: category.id}) }}">Modifier</a>
+                                        {% if row.total == 0 %}
+                                            <form method="post" action="{{ path('app_category_delete', {id: category.id}) }}"
+                                                  data-turbo-confirm="Supprimer la catégorie « {{ category.name }} » ?">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('category-delete-' ~ category.id) }}">
+                                                <button class="btn btn-ghost btn-sm" type="submit">Supprimer</button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

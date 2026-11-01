@@ -1,0 +1,26 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}{{ location ? 'Modifier ' ~ location.name : 'Nouvel emplacement' }}{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <div>
+            <p class="page-eyebrow"><a href="{{ path('app_location_index') }}">Emplacements</a></p>
+            <h1 class="page-title">{{ location ? location.name : 'Nouvel emplacement' }}</h1>
+        </div>
+    </header>
+
+    {{ form_start(form, {attr: {class: 'card form-narrow', novalidate: 'novalidate'}}) }}
+        <section class="form-section">
+            <div class="form-grid">
+                {{ form_row(form.kind, {row_attr: {class: 'span-2'}}) }}
+                {{ form_row(form.name, {row_attr: {class: 'span-2'}}) }}
+                {{ form_row(form.parent, {row_attr: {class: 'span-2'}}) }}
+            </div>
+        </section>
+        <div class="form-actions">
+            <a class="btn btn-ghost" href="{{ path('app_location_index') }}">Annuler</a>
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

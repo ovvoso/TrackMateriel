@@ -20,6 +20,9 @@ final class LoginTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = self::createClient();
+
+        // Les compteurs de tentatives survivent d'une exécution à l'autre : on repart de zéro
+        self::getContainer()->get('cache.rate_limiter')->clear();
     }
 
     public function testAnonymousVisitorIsSentToLogin(): void

@@ -1,0 +1,78 @@
+{# Thème de formulaire aligné sur le design system (.field, .input, .select…) #}
+{% use 'form_div_layout.html.twig' %}
+
+{%- block form_row -%}
+    {%- set row_attr = row_attr|merge({class: ('field ' ~ (row_attr.class ?? ''))|trim}) -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~ '_help'}} -%}
+    {%- endif -%}
+    <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+        {{- form_label(form) -}}
+        {{- form_widget(form, widget_attr) -}}
+        {{- form_help(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{%- endblock form_row -%}
+
+{%- block form_label -%}
+    {%- if label is not same as(false) -%}
+        {%- set label_attr = label_attr|merge({class: ('field-label ' ~ (label_attr.class ?? ''))|trim}) -%}
+        {{- parent() -}}
+    {%- endif -%}
+{%- endblock form_label -%}
+
+{%- block form_label_content -%}
+    {{- parent() -}}
+    {%- if not required and not compound -%}<span class="field-optional"> · facultatif</span>{%- endif -%}
+{%- endblock form_label_content -%}
+
+{%- block form_help -%}
+    {%- if help is not empty -%}
+        <p id="{{ id }}_help" class="field-help">{{ help }}</p>
+    {%- endif -%}
+{%- endblock form_help -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <div class="field-errors" role="alert">
+            {%- for error in errors -%}
+                <p>{{ ux_icon('lucide:circle-alert', {'aria-hidden': 'true'}) }}{{ error.message }}</p>
+            {%- endfor -%}
+        </div>
+    {%- endif -%}
+{%- endblock form_errors -%}
+
+{%- block form_widget_simple -%}
+    {%- set attr = attr|merge({class: ('input ' ~ (attr.class ?? '') ~ (errors|length > 0 ? ' is-invalid'))|trim}) -%}
+    {%- if errors|length > 0 -%}{%- set attr = attr|merge({'aria-invalid': 'true'}) -%}{%- endif -%}
+    {{- parent() -}}
+{%- endblock form_widget_simple -%}
+
+{%- block textarea_widget -%}
+    {%- set attr = attr|merge({class: ('input textarea ' ~ (attr.class ?? '') ~ (errors|length > 0 ? ' is-invalid'))|trim}) -%}
+    {{- parent() -}}
+{%- endblock textarea_widget -%}
+
+{%- block choice_widget_collapsed -%}
+    {%- set attr = attr|merge({class: ('input select ' ~ (attr.class ?? '') ~ (errors|length > 0 ? ' is-invalid'))|trim}) -%}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed -%}
+
+{%- block choice_widget_expanded -%}
+    <div {{ block('widget_container_attributes') }} class="segmented" role="radiogroup">
+        {%- for child in form %}
+            <label class="segmented-option">
+                {{- form_widget(child) -}}
+                <span>{{ child.vars.label }}</span>
+            </label>
+        {% endfor -%}
+    </div>
+{%- endblock choice_widget_expanded -%}
+
+{%- block money_widget -%}
+    <div class="input-affix">
+        {{- block('form_widget_simple') -}}
+        <span class="input-affix-text">{{ money_pattern|replace({'{{ widget }}': ''})|trim ?: app_currency }}</span>
+    </div>
+{%- endblock money_widget -%}

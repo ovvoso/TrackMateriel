@@ -1,2 +1,51 @@
+# Cycle de vie d'un équipement. Les gardes réservent chaque transition à un profil :
+# le technicien gère tout ce qui touche à la maintenance, le gestionnaire le reste.
 framework:
-    workflows: null
+    workflows:
+        asset_lifecycle:
+            type: state_machine
+            audit_trail:
+                enabled: '%kernel.debug%'
+            marking_store:
+                type: method
+                property: status
+            supports:
+                - App\Inventory\Entity\Asset
+            initial_marking: available
+            places:
+                - available
+                - in_service
+                - in_maintenance
+                - out_of_order
+                - retired
+            transitions:
+                put_in_service:
+                    from: available
+                    to: in_service
+                    guard: "is_granted('ROLE_GESTIONNAIRE')"
+                    metadata: { label: 'Mettre en service', icon: 'lucide:circle-play' }
+                withdraw:
+                    from: in_service
+                    to: available
+                    guard: "is_granted('ROLE_GESTIONNAIRE')"
+                    metadata: { label: 'Retirer du service', icon: 'lucide:undo-2' }
+                send_to_maintenance:
+                    from: [available, in_service, out_of_order]
+                    to: in_maintenance
+                    guard: "is_granted('ROLE_TECHNICIEN')"
+                    metadata: { label: 'Envoyer en maintenance', icon: 'lucide:wrench' }
+                return_from_maintenance:
+                    from: in_maintenance
+                    to: available
+                    guard: "is_granted('ROLE_TECHNICIEN')"
+                    metadata: { label: 'Remettre en circulation', icon: 'lucide:circle-check' }
+                declare_out_of_order:
+                    from: [available, in_service, in_maintenance]
+                    to: out_of_order
+                    guard: "is_granted('ROLE_TECHNICIEN')"
+                    metadata: { label: 'Déclarer hors service', icon: 'lucide:circle-x' }
+                retire:
+                    from: [available, out_of_order]
+                    to: retired
+                    guard: "is_granted('ROLE_GESTIONNAIRE')"
+                    metadata: { label: 'Réformer', icon: 'lucide:archive', danger: true, confirm: 'Réformer cet équipement ? Il sortira définitivement du parc ; son historique est conservé.' }

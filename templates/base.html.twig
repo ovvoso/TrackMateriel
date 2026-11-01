@@ -8,7 +8,7 @@
         <meta name="color-scheme" content="light dark">
         <meta name="csp-nonce" content="{{ csp_nonce() }}">
         <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
-        {% for sheet in ['tokens', 'base', 'components', 'layout'] %}
+        {% for sheet in ['tokens', 'base', 'components', 'data', 'layout'] %}
             <link rel="stylesheet" href="{{ asset('styles/' ~ sheet ~ '.css') }}">
         {% endfor %}
         {% block importmap %}{{ importmap('app', {nonce: csp_nonce()}) }}{% endblock %}

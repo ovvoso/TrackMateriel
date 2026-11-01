@@ -1,0 +1,7 @@
+{% props icon, title, text = null %}
+<div {{ attributes.defaults({class: 'empty'}) }}>
+    <span class="empty-icon">{{ ux_icon(icon, {'aria-hidden': 'true'}) }}</span>
+    <p class="empty-title">{{ title }}</p>
+    {% if text %}<p class="empty-text">{{ text }}</p>{% endif %}
+    {% block content %}{% endblock %}
+</div>

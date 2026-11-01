@@ -1,0 +1,81 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}Emplacements{% endblock %}
+
+{% set can_manage = is_granted('INVENTORY_MANAGE') %}
+
+{% macro row(location, counts, can_manage) %}
+    {% set total = counts[location.id.toRfc4122] ?? 0 %}
+    <div class="tree-row">
+        {{ ux_icon(location.kind.icon, {'aria-hidden': 'true'}) }}
+        <a class="tree-name" href="{{ path('app_asset_index', {emplacement: location.id}) }}">{{ location.name }}</a>
+        <span class="tree-meta">
+            {{ location.kind.label }}{% if total > 0 %} · {{ total }} équipement{{ total > 1 ? 's' }}{% endif %}
+        </span>
+        {% if can_manage %}
+            <div class="tree-actions">
+                {% if location.kind.value != 'room' %}
+                    <a class="btn btn-ghost btn-sm" href="{{ path('app_location_new', {dans: location.id}) }}">
+                        {{ ux_icon('lucide:plus', {'aria-hidden': 'true'}) }} {{ location.kind.value == 'site' ? 'Bâtiment' : 'Salle' }}
+                    </a>
+                {% endif %}
+                <a class="btn btn-ghost btn-sm" href="{{ path('app_location_edit', {id: location.id}) }}">Modifier</a>
+                <form method="post" action="{{ path('app_location_delete', {id: location.id}) }}"
+                      data-turbo-confirm="Supprimer « {{ location.name }} » ?">
+                    <input type="hidden" name="_token" value="{{ csrf_token('location-delete-' ~ location.id) }}">
+                    <button class="btn btn-ghost btn-sm" type="submit">Supprimer</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% block content %}
+    <header class="page-header">
+        <div>
+            <h1 class="page-title">Emplacements</h1>
+            <p class="page-lead">Où se trouve le matériel : sites, bâtiments et salles. Cliquez sur un emplacement pour voir ce qu’il contient.</p>
+        </div>
+        {% if can_manage %}
+            <a class="btn btn-primary" href="{{ path('app_location_new') }}">
+                {{ ux_icon('lucide:plus', {'aria-hidden': 'true'}) }} Nouvel emplacement
+            </a>
+        {% endif %}
+    </header>
+
+    <section class="card">
+        {% if sites is empty %}
+            <twig:EmptyState icon="lucide:map-pin" title="Aucun emplacement" text="Commencez par créer un site (votre établissement), puis ses bâtiments et ses salles.">
+                {% if can_manage %}
+                    <a class="btn btn-primary" href="{{ path('app_location_new') }}">{{ ux_icon('lucide:plus', {'aria-hidden': 'true'}) }} Créer un site</a>
+                {% endif %}
+            </twig:EmptyState>
+        {% else %}
+            <div class="card-body">
+                <ul class="tree">
+                    {% for site in sites %}
+                        <li>
+                            {{ _self.row(site, asset_counts, can_manage) }}
+                            {% if site.children is not empty %}
+                                <ul class="tree">
+                                    {% for building in site.children %}
+                                        <li>
+                                            {{ _self.row(building, asset_counts, can_manage) }}
+                                            {% if building.children is not empty %}
+                                                <ul class="tree">
+                                                    {% for room in building.children %}
+                                                        <li>{{ _self.row(room, asset_counts, can_manage) }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

@@ -1,6 +1,8 @@
 # yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 
 parameters:
+    # Devise des prix d'achat (code ISO 4217)
+    app.currency: XOF
 
 services:
     _defaults:
@@ -21,10 +23,7 @@ when@dev: &demo_data
             autowire: true
             autoconfigure: true
 
-        App\Identity\Factory\:
-            resource: '../src/Identity/Factory/'
-
-        App\Story\:
-            resource: '../src/Story/'
+        App\:
+            resource: '../src/{*/Factory,Story}/'
 
 when@test: *demo_data

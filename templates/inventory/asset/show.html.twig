@@ -1,0 +1,106 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}{{ asset.name }} · {{ asset.code }}{% endblock %}
+
+{% set transitions = workflow_transitions(asset, 'asset_lifecycle') %}
+
+{% block content %}
+    <header class="page-header">
+        <div>
+            <p class="page-eyebrow"><a href="{{ path('app_asset_index') }}">Inventaire</a> · <span class="code">{{ asset.code }}</span></p>
+            <h1 class="page-title">{{ asset.name }}</h1>
+            <p class="page-lead"><twig:Status :status="asset.status" :large="true" /></p>
+        </div>
+        <div class="btn-group">
+            {% for transition in transitions %}
+                {% set meta = workflow_metadata(asset, 'label', transition, 'asset_lifecycle') %}
+                {% set danger = workflow_metadata(asset, 'danger', transition, 'asset_lifecycle') %}
+                {% set confirm = workflow_metadata(asset, 'confirm', transition, 'asset_lifecycle') %}
+                <form method="post" action="{{ path('app_asset_transition', {code: asset.code, transition: transition.name}) }}"
+                      {% if confirm %}data-turbo-confirm="{{ confirm }}"{% endif %}>
+                    <input type="hidden" name="_token" value="{{ csrf_token('asset-transition-' ~ asset.code) }}">
+                    <button class="btn {{ danger ? 'btn-danger' : 'btn-secondary' }}" type="submit">
+                        {{ ux_icon(workflow_metadata(asset, 'icon', transition, 'asset_lifecycle'), {'aria-hidden': 'true'}) }}
+                        {{ meta }}
+                    </button>
+                </form>
+            {% endfor %}
+            {% if is_granted('ASSET_EDIT', asset) %}
+                <a class="btn btn-primary" href="{{ path('app_asset_edit', {code: asset.code}) }}">
+                    {{ ux_icon('lucide:pencil', {'aria-hidden': 'true'}) }} Modifier
+                </a>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="grid-2">
+        <div class="stack">
+            <section class="card" aria-labelledby="caracteristiques">
+                <div class="card-header">
+                    <h2 class="card-title" id="caracteristiques">Caractéristiques</h2>
+                </div>
+                <div class="card-body">
+                    <dl class="meta-list meta-grid">
+                        <div><dt>Catégorie</dt><dd>{{ asset.category.name }}</dd></div>
+                        <div><dt>Emplacement</dt><dd>{{ asset.location ? asset.location.path : 'Non rangé' }}</dd></div>
+                        <div><dt>Marque</dt><dd>{{ asset.brand ?: '—' }}</dd></div>
+                        <div><dt>Modèle</dt><dd>{{ asset.model ?: '—' }}</dd></div>
+                        <div><dt>Numéro de série</dt><dd class="mono">{{ asset.serialNumber ?: '—' }}</dd></div>
+                        <div><dt>État physique</dt><dd>{{ asset.condition.label }}</dd></div>
+                    </dl>
+                    {% if asset.notes %}
+                        <div class="note">
+                            <p class="note-title">Notes</p>
+                            <p>{{ asset.notes|nl2br }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            {% if is_granted('ASSET_VIEW_PURCHASE', asset) %}
+                <section class="card" aria-labelledby="achat">
+                    <div class="card-header">
+                        <h2 class="card-title" id="achat">Achat et garantie</h2>
+                        {% if asset.warrantyEndsAt %}
+                            {% if asset.underWarranty(date('today')) %}
+                                <span class="badge badge-accent">Sous garantie</span>
+                            {% else %}
+                                <span class="badge">Garantie expirée</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <dl class="meta-list meta-grid">
+                            <div><dt>Date d’achat</dt><dd>{{ asset.purchasedAt ? asset.purchasedAt|format_date('long') : '—' }}</dd></div>
+                            <div><dt>Prix d’achat</dt><dd>{{ asset.purchasePrice is not null ? asset.purchasePrice|format_currency(app_currency) : '—' }}</dd></div>
+                            <div><dt>Fin de garantie</dt><dd>{{ asset.warrantyEndsAt ? asset.warrantyEndsAt|format_date('long') : '—' }}</dd></div>
+                            <div><dt>Fournisseur</dt><dd>{{ asset.supplier ?: '—' }}</dd></div>
+                        </dl>
+                    </div>
+                </section>
+            {% endif %}
+        </div>
+
+        <section class="card" aria-labelledby="historique">
+            <div class="card-header">
+                <h2 class="card-title" id="historique">Historique</h2>
+            </div>
+            <div class="card-body">
+                <ol class="timeline">
+                    {% for event in events %}
+                        <li class="timeline-item">
+                            <span class="timeline-icon">{{ ux_icon(event.type.icon, {'aria-hidden': 'true'}) }}</span>
+                            <div class="timeline-text">
+                                <p>{{ event.summary }}</p>
+                                <p class="timeline-meta">
+                                    <time datetime="{{ event.occurredAt|date('c') }}">{{ event.occurredAt|format_datetime('medium', 'short') }}</time>
+                                    · {{ event.actor ? event.actor.fullName : 'Système' }}
+                                </p>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </section>
+    </div>
+{% endblock %}

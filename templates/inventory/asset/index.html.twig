@@ -1,0 +1,142 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}Inventaire{% endblock %}
+
+{% set query = app.request.query.all %}
+
+{% block content %}
+    <header class="page-header">
+        <div>
+            <h1 class="page-title">Inventaire</h1>
+            <p class="page-lead">L’ensemble du matériel de l’établissement, de sa mise en stock à sa réforme.</p>
+        </div>
+        {% if is_granted('INVENTORY_MANAGE') %}
+            <div class="btn-group">
+                <a class="btn btn-secondary" href="{{ path('app_asset_export', query|filter((v, k) => k != 'page')) }}">
+                    {{ ux_icon('lucide:download', {'aria-hidden': 'true'}) }} Exporter
+                </a>
+                <a class="btn btn-primary" href="{{ path('app_asset_new') }}">
+                    {{ ux_icon('lucide:plus', {'aria-hidden': 'true'}) }} Nouvel équipement
+                </a>
+            </div>
+        {% endif %}
+    </header>
+
+    <section class="card">
+        <form class="toolbar" method="get" role="search" data-turbo-action="advance">
+            <div class="field toolbar-search">
+                <label class="field-label" for="q">Rechercher</label>
+                <div class="search-input">
+                    {{ ux_icon('lucide:search', {'aria-hidden': 'true'}) }}
+                    <input class="input" type="search" id="q" name="q" value="{{ search.query }}" placeholder="Code, désignation, marque, n° de série…">
+                </div>
+            </div>
+            <div class="field">
+                <label class="field-label" for="categorie">Catégorie</label>
+                <select class="input select" id="categorie" name="categorie">
+                    <option value="">Toutes</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {{ search.category and search.category.equals(category.id) ? 'selected' }}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label class="field-label" for="etat">État</label>
+                <select class="input select" id="etat" name="etat">
+                    <option value="">Tous</option>
+                    {% for status in statuses %}
+                        <option value="{{ status.value }}" {{ search.status == status ? 'selected' }}>{{ status.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label class="field-label" for="emplacement">Emplacement</label>
+                <select class="input select" id="emplacement" name="emplacement">
+                    <option value="">Tous</option>
+                    {% for location in locations %}
+                        <option value="{{ location.id }}" {{ search.location and search.location.equals(location.id) ? 'selected' }}>{{ location.path }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label class="field-label" for="tri">Trier par</label>
+                <select class="input select" id="tri" name="tri">
+                    {% for value, label in {code: 'Code', name: 'Désignation', updated: 'Dernière modification'} %}
+                        <option value="{{ value }}" {{ search.sort == value ? 'selected' }}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" type="submit">Filtrer</button>
+                {% if search.filtered %}
+                    <a class="btn btn-ghost" href="{{ path('app_asset_index') }}">Effacer</a>
+                {% endif %}
+            </div>
+        </form>
+
+        {% if page.total == 0 %}
+            {% if search.filtered %}
+                <twig:EmptyState icon="lucide:search-x" title="Aucun équipement ne correspond" text="Modifiez ou effacez les filtres pour élargir la recherche." />
+            {% else %}
+                <twig:EmptyState icon="lucide:package" title="L’inventaire est vide" text="Ajoutez votre premier équipement : il recevra automatiquement son code d’inventaire.">
+                    {% if is_granted('INVENTORY_MANAGE') %}
+                        <a class="btn btn-primary" href="{{ path('app_asset_new') }}">{{ ux_icon('lucide:plus', {'aria-hidden': 'true'}) }} Nouvel équipement</a>
+                    {% endif %}
+                </twig:EmptyState>
+            {% endif %}
+        {% else %}
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="hide-sm">Code</th>
+                            <th scope="col">Équipement</th>
+                            <th scope="col" class="hide-sm">Catégorie</th>
+                            <th scope="col">Emplacement</th>
+                            <th scope="col">État</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asset in page %}
+                            <tr>
+                                <td class="hide-sm"><span class="code">{{ asset.code }}</span></td>
+                                <td>
+                                    <span class="code show-sm">{{ asset.code }}</span>
+                                    <a class="cell-title" href="{{ path('app_asset_show', {code: asset.code}) }}">{{ asset.name }}</a>
+                                    {% if asset.brand or asset.model %}
+                                        <div class="cell-sub">{{ [asset.brand, asset.model]|filter(v => v)|join(' ') }}</div>
+                                    {% endif %}
+                                </td>
+                                <td class="muted hide-sm">{{ asset.category.name }}</td>
+                                <td>
+                                    {% if asset.location %}
+                                        {{ asset.location.name }}
+                                        {% if asset.location.parent %}<div class="cell-sub hide-sm">{{ asset.location.parent.path }}</div>{% endif %}
+                                    {% else %}
+                                        <span class="subtle">Non rangé</span>
+                                    {% endif %}
+                                </td>
+                                <td><twig:Status :status="asset.status" /></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <footer class="list-footer">
+                <span>{{ page.firstIndex }}–{{ page.lastIndex }} sur {{ page.total }} équipement{{ page.total > 1 ? 's' }}</span>
+                {% if page.pageCount > 1 %}
+                    <nav class="pagination" aria-label="Pagination">
+                        {% if page.hasPrevious %}
+                            <a class="btn btn-secondary btn-sm" href="{{ path('app_asset_index', query|merge({page: page.number - 1})) }}" rel="prev">Précédent</a>
+                        {% endif %}
+                        <span class="btn btn-ghost btn-sm" aria-current="page">Page {{ page.number }} / {{ page.pageCount }}</span>
+                        {% if page.hasNext %}
+                            <a class="btn btn-secondary btn-sm" href="{{ path('app_asset_index', query|merge({page: page.number + 1})) }}" rel="next">Suivant</a>
+                        {% endif %}
+                    </nav>
+                {% endif %}
+            </footer>
+        {% endif %}
+    </section>
+{% endblock %}

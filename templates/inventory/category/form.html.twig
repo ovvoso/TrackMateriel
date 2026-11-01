@@ -1,0 +1,25 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}{{ category ? 'Modifier ' ~ category.name : 'Nouvelle catégorie' }}{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <div>
+            <p class="page-eyebrow"><a href="{{ path('app_category_index') }}">Catégories</a></p>
+            <h1 class="page-title">{{ category ? category.name : 'Nouvelle catégorie' }}</h1>
+        </div>
+    </header>
+
+    {{ form_start(form, {attr: {class: 'card form-narrow', novalidate: 'novalidate'}}) }}
+        <section class="form-section">
+            <div class="form-grid">
+                {{ form_row(form.name, {row_attr: {class: 'span-2'}}) }}
+                {{ form_row(form.description, {row_attr: {class: 'span-2'}}) }}
+            </div>
+        </section>
+        <div class="form-actions">
+            <a class="btn btn-ghost" href="{{ path('app_category_index') }}">Annuler</a>
+            <button class="btn btn-primary" type="submit">Enregistrer</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

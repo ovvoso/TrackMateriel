@@ -2,23 +2,34 @@
 
 {% block title %}Tableau de bord{% endblock %}
 
+{% set onboarding = active_total == 0 %}
+
 {% block content %}
     <header class="page-header">
         <div>
-            <p class="page-eyebrow">{{ 'now'|format_date('full', locale: 'fr')|capitalize }}</p>
+            <p class="page-eyebrow">{{ 'now'|format_date('full')|capitalize }}</p>
             <h1 class="page-title">Bonjour, {{ app.user.firstName }}</h1>
-            <p class="page-lead">Votre espace de gestion du parc matériel. Les indicateurs s'afficheront ici dès que l'inventaire sera renseigné.</p>
+            <p class="page-lead">
+                {% if onboarding %}
+                    Votre espace de gestion du parc matériel. Suivez les étapes ci-dessous pour le mettre en place.
+                {% else %}
+                    Où en est le parc aujourd’hui.
+                {% endif %}
+            </p>
         </div>
+        {% if not onboarding and is_granted('INVENTORY_MANAGE') %}
+            <a class="btn btn-primary" href="{{ path('app_asset_new') }}">{{ ux_icon('lucide:plus', {'aria-hidden': 'true'}) }} Nouvel équipement</a>
+        {% endif %}
     </header>
 
-    <div class="grid-2">
+    {% if onboarding %}
         <section class="card" aria-labelledby="mise-en-route">
             <div class="card-header">
                 <div>
                     <h2 class="card-title" id="mise-en-route">Mise en route</h2>
                     <p class="card-subtitle">Les étapes pour rendre votre parc opérationnel.</p>
                 </div>
-                <span class="badge">0 sur 4</span>
+                <span class="badge">{{ location_count > 0 ? 1 : 0 }} sur 4</span>
             </div>
             <ol class="steps">
                 <li class="step">
@@ -26,14 +37,18 @@
                         <p class="step-title">Décrire les emplacements</p>
                         <p class="step-text">Sites, bâtiments et salles où se trouve le matériel.</p>
                     </div>
-                    <span class="badge">Bientôt</span>
+                    {% if location_count > 0 %}
+                        <span class="badge badge-accent">Fait</span>
+                    {% else %}
+                        <a class="btn btn-secondary btn-sm" href="{{ path('app_location_index') }}">Commencer</a>
+                    {% endif %}
                 </li>
                 <li class="step">
                     <div>
-                        <p class="step-title">Constituer l'inventaire</p>
-                        <p class="step-text">Saisie ou import CSV, avec un code d'inventaire par équipement.</p>
+                        <p class="step-title">Constituer l’inventaire</p>
+                        <p class="step-text">Chaque équipement reçoit un code d’inventaire unique.</p>
                     </div>
-                    <span class="badge">Bientôt</span>
+                    <a class="btn btn-secondary btn-sm" href="{{ path('app_asset_index') }}">Commencer</a>
                 </li>
                 <li class="step">
                     <div>
@@ -44,34 +59,90 @@
                 </li>
                 <li class="step">
                     <div>
-                        <p class="step-title">Inviter l'équipe</p>
+                        <p class="step-title">Inviter l’équipe</p>
                         <p class="step-text">Gestionnaires, techniciens et enseignants, chacun avec son profil.</p>
                     </div>
                     <span class="badge">Bientôt</span>
                 </li>
             </ol>
         </section>
+    {% else %}
+        <div class="kpis">
+            <a class="card kpi" href="{{ path('app_asset_index') }}">
+                <span class="kpi-label">Parc actif</span>
+                <span class="kpi-value">{{ active_total|format_number }}</span>
+                <span class="kpi-hint subtle">équipements hors réforme</span>
+            </a>
+            {% for status in statuses|filter(s => s.value in ['available', 'in_maintenance', 'out_of_order']) %}
+                <a class="card kpi" href="{{ path('app_asset_index', {etat: status.value}) }}">
+                    <span class="kpi-label">{{ status.label }}</span>
+                    <span class="kpi-value">{{ by_status[status.value]|format_number }}</span>
+                    <span class="kpi-hint status status-{{ status.tone }}">{{ (by_status[status.value] / active_total * 100)|round }} % du parc</span>
+                </a>
+            {% endfor %}
+        </div>
 
-        <section class="card" aria-labelledby="mon-compte">
-            <div class="card-header">
-                <h2 class="card-title" id="mon-compte">Mon compte</h2>
+        <div class="grid-2">
+            <div class="stack">
+                <section class="card" aria-labelledby="activite">
+                    <div class="card-header">
+                        <h2 class="card-title" id="activite">Activité récente</h2>
+                        <a class="btn btn-ghost btn-sm" href="{{ path('app_asset_index', {tri: 'updated'}) }}">Tout voir</a>
+                    </div>
+                    <ul class="list-plain">
+                        {% for event in latest_events %}
+                            <li>
+                                <div>
+                                    <a class="cell-title" href="{{ path('app_asset_show', {code: event.asset.code}) }}">{{ event.asset.name }}</a>
+                                    <div class="cell-sub">{{ event.summary }}</div>
+                                </div>
+                                <span class="subtle" title="{{ event.occurredAt|format_datetime('medium', 'short') }}">{{ event.occurredAt|format_date('medium') }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+
+                <section class="card" aria-labelledby="garanties">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title" id="garanties">Garanties à échéance</h2>
+                            <p class="card-subtitle">Dans les 90 prochains jours.</p>
+                        </div>
+                    </div>
+                    {% if warranties is empty %}
+                        <twig:EmptyState icon="lucide:shield-check" title="Rien à signaler" text="Aucune garantie ne se termine dans les trois prochains mois." />
+                    {% else %}
+                        <ul class="list-plain">
+                            {% for asset in warranties %}
+                                <li>
+                                    <div>
+                                        <a class="cell-title" href="{{ path('app_asset_show', {code: asset.code}) }}">{{ asset.name }}</a>
+                                        <div class="cell-sub code">{{ asset.code }}</div>
+                                    </div>
+                                    <span class="muted">{{ asset.warrantyEndsAt|format_date('medium') }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </section>
             </div>
-            <div class="card-body">
-                <dl class="meta-list">
-                    <div>
-                        <dt>Adresse e-mail</dt>
-                        <dd>{{ app.user.email }}</dd>
-                    </div>
-                    <div>
-                        <dt>Profil</dt>
-                        <dd><span class="badge badge-accent">{{ app.user.role.label }}</span></dd>
-                    </div>
-                    <div>
-                        <dt>Membre depuis</dt>
-                        <dd>{{ app.user.createdAt|format_date('long', locale: 'fr') }}</dd>
-                    </div>
-                </dl>
-            </div>
-        </section>
-    </div>
+
+            <section class="card" aria-labelledby="repartition">
+                <div class="card-header">
+                    <h2 class="card-title" id="repartition">Répartition par catégorie</h2>
+                </div>
+                <div class="card-body">
+                    {% set max = by_category is empty ? 1 : max(by_category|map(r => r.total)) %}
+                    <ul class="bars">
+                        {% for row in by_category %}
+                            <li>
+                                <div class="bar-head"><span>{{ row.name }}</span><span>{{ row.total }}</span></div>
+                                <meter class="bar" min="0" max="{{ max }}" value="{{ row.total }}" aria-label="{{ row.name }} : {{ row.total }}">{{ row.total }}</meter>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+        </div>
+    {% endif %}
 {% endblock %}
