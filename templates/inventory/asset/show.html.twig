@@ -2,7 +2,8 @@
 
 {% block title %}{{ asset.name }} · {{ asset.code }}{% endblock %}
 
-{% set transitions = workflow_transitions(asset, 'asset_lifecycle') %}
+{# Prêt et retour se font depuis le module Prêts, pas par un simple bouton d'état #}
+{% set transitions = workflow_transitions(asset, 'asset_lifecycle')|filter(t => not workflow_metadata(asset, 'internal', t, 'asset_lifecycle')) %}
 
 {% block content %}
     <header class="page-header">
@@ -12,6 +13,11 @@
             <p class="page-lead"><twig:Status :status="asset.status" :large="true" /></p>
         </div>
         <div class="btn-group">
+            {% if workflow_can(asset, 'lend', 'asset_lifecycle') %}
+                <a class="btn btn-secondary" href="{{ path('app_loan_new', {materiel: asset.code}) }}">
+                    {{ ux_icon('lucide:arrow-up-right', {'aria-hidden': 'true'}) }} Prêter
+                </a>
+            {% endif %}
             {% for transition in transitions %}
                 {% set meta = workflow_metadata(asset, 'label', transition, 'asset_lifecycle') %}
                 {% set danger = workflow_metadata(asset, 'danger', transition, 'asset_lifecycle') %}
@@ -79,6 +85,8 @@
                     </div>
                 </section>
             {% endif %}
+
+            <twig:AssetLoans :asset="asset" />
         </div>
 
         <section class="card" aria-labelledby="historique">

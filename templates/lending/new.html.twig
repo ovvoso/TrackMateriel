@@ -1,0 +1,93 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}Nouveau prêt{% endblock %}
+
+{# Regroupe les cases du matériel par catégorie #}
+{% set asset_by_id = {} %}
+{% for choice in form.assets.vars.choices %}
+    {% set asset_by_id = asset_by_id|merge({(choice.value): choice.data}) %}
+{% endfor %}
+{% set groups = {} %}
+{% for child in form.assets %}
+    {% set category = asset_by_id[child.vars.value].category.name %}
+    {% set groups = groups|merge({(category): (groups[category] ?? [])|merge([child])}) %}
+{% endfor %}
+
+{% block content %}
+    <header class="page-header">
+        <div>
+            <p class="page-eyebrow"><a href="{{ path('app_loan_index') }}">Prêts</a></p>
+            <h1 class="page-title">Nouveau prêt</h1>
+            <p class="page-lead">Seul le matériel disponible peut être prêté. La référence du prêt est attribuée à l’enregistrement.</p>
+        </div>
+    </header>
+
+    {{ form_start(form, {attr: {novalidate: 'novalidate', 'data-controller': 'borrower'}}) }}
+        <div class="grid-2">
+            <section class="card" aria-labelledby="materiel" data-controller="checklist">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title" id="materiel">Matériel</h2>
+                        <p class="card-subtitle" data-checklist-target="count" aria-live="polite"></p>
+                    </div>
+                </div>
+                <div class="card-body stack-sm">
+                    {{ form_errors(form.assets) }}
+                    {% if groups is empty %}
+                        <twig:EmptyState icon="lucide:package-x" title="Aucun équipement disponible" text="Tout le matériel est déjà prêté, en service ou en maintenance." />
+                    {% else %}
+                        <div class="search-input">
+                            {{ ux_icon('lucide:search', {'aria-hidden': 'true'}) }}
+                            <input class="input" type="search" placeholder="Filtrer par nom, code, marque, salle…" aria-label="Filtrer le matériel"
+                                   data-checklist-target="filter" data-action="input->checklist#filter">
+                        </div>
+                        <div class="checklist" data-action="change->checklist#update">
+                            {% for category, children in groups %}
+                                <fieldset class="checklist-group" data-checklist-target="group">
+                                    <legend class="checklist-legend">{{ category }}</legend>
+                                    {% for child in children %}
+                                        {% set asset = asset_by_id[child.vars.value] %}
+                                        <label class="checklist-item" data-checklist-target="item"
+                                               data-search="{{ [asset.name, asset.code, asset.brand, asset.model, asset.location ? asset.location.name, category]|join(' ')|lower }}">
+                                            <input type="checkbox" id="{{ child.vars.id }}" name="{{ child.vars.full_name }}" value="{{ child.vars.value }}" {{ child.vars.checked ? 'checked' }}>
+                                            <span class="checklist-text">
+                                                <span class="cell-title">{{ asset.name }}</span>
+                                                <span class="cell-sub">
+                                                    <span class="code">{{ asset.code }}</span>
+                                                    {% if asset.model %} · {{ asset.model }}{% endif %}
+                                                    {% if asset.location %} · {{ asset.location.name }}{% endif %}
+                                                </span>
+                                            </span>
+                                        </label>
+                                        {% do child.setRendered %}
+                                    {% endfor %}
+                                </fieldset>
+                            {% endfor %}
+                            <p class="subtle" data-checklist-target="empty" hidden>Aucun équipement ne correspond.</p>
+                        </div>
+                    {% endif %}
+                    {% do form.assets.setRendered %}
+                </div>
+            </section>
+
+            <section class="card" aria-labelledby="emprunteur">
+                <div class="card-header">
+                    <h2 class="card-title" id="emprunteur">Emprunteur et retour</h2>
+                </div>
+                <div class="card-body stack-md">
+                    {{ form_row(form.borrowerType) }}
+                    {{ form_row(form.account) }}
+                    {{ form_row(form.personName) }}
+                    {{ form_row(form.personGroup) }}
+                    {{ form_row(form.dueAt) }}
+                    {{ form_row(form.purpose) }}
+                    {{ form_row(form.notes) }}
+                </div>
+                <div class="form-actions">
+                    <a class="btn btn-ghost" href="{{ path('app_loan_index') }}">Annuler</a>
+                    <button class="btn btn-primary" type="submit">{{ ux_icon('lucide:arrow-up-right', {'aria-hidden': 'true'}) }} Enregistrer le prêt</button>
+                </div>
+            </section>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

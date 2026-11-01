@@ -11,7 +11,7 @@ Gestion du parc matériel des établissements d'enseignement : inventaire, prêt
 | Comptes, profils et connexion sécurisée | ✅ Livré |
 | Inventaire : codes d'inventaire, emplacements, catégories, cycle de vie, historique, export CSV | ✅ Livré |
 | Tableau de bord : état du parc, activité récente, garanties à échéance | ✅ Livré |
-| Prêts et affectations, avec retours et retards | 🔜 |
+| Prêts : plusieurs équipements par prêt, emprunteurs avec ou sans compte, retours partiels, prolongation, retards | ✅ Livré |
 | Réservations de matériel pour les cours | 🔜 |
 | Tickets de maintenance et maintenance préventive | 🔜 |
 | Étiquettes QR code et signalement de panne | 🔜 |
@@ -46,6 +46,8 @@ src/
 │   ├── Entity/  Enum/  Repository/  Security/  Controller/  Command/  Factory/
 ├── Inventory/     Emplacements, catégories, équipements, cycle de vie et journal
 │   ├── Entity/  Enum/  Form/  Service/  Security/  Validator/  EventListener/  …
+├── Lending/       Prêts : sortie, retours partiels, prolongation, retards
+│   ├── Entity/  Model/  Form/  Service/  Security/  Twig/  …
 ├── Shared/        Briques transverses : en-têtes de sécurité, CSP, pagination, tableau de bord
 ├── Story/         Jeu de données de démonstration (dev et test)
 └── Migrations/
@@ -59,6 +61,8 @@ Quelques choix de conception :
 - **Journal en ajout seul** : création, déplacement, modification et changement d'état sont tracés avec leur auteur. Un équipement n'est jamais supprimé, il est réformé.
 - **Codes d'inventaire** au format `INV-2026-00417`, tirés d'une séquence PostgreSQL pour éviter tout doublon.
 - **Formulaires sur objets de saisie** : l'entité reste toujours valide et n'est modifiée qu'après validation.
+- **Un seul prêt ouvert par équipement**, garanti par un index unique partiel PostgreSQL en plus du contrôle applicatif : deux prêts saisis au même instant ne peuvent pas emporter le même matériel.
+- **Domaines découplés** : la fiche équipement affiche ses prêts via un composant Twig fourni par le module Prêts, sans que l'Inventaire dépende des Prêts.
 
 ## Sécurité
 

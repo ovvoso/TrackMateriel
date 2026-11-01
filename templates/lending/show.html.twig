@@ -1,0 +1,109 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}Prêt {{ loan.reference }}{% endblock %}
+
+{% set today = date('today') %}
+
+{% block content %}
+    <header class="page-header">
+        <div>
+            <p class="page-eyebrow"><a href="{{ path('app_loan_index') }}">Prêts</a> · <span class="code">{{ loan.reference }}</span></p>
+            <h1 class="page-title">{{ loan.borrower.name }}</h1>
+            <p class="page-lead">
+                <span class="status status-{{ state.tone }} is-large">{{ state.label }}</span>
+                {% if loan.borrower.group %}<span class="muted"> · {{ loan.borrower.group }}</span>{% endif %}
+            </p>
+        </div>
+    </header>
+
+    <div class="grid-2">
+        <section class="card" aria-labelledby="materiel">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title" id="materiel">Matériel prêté</h2>
+                    <p class="card-subtitle">
+                        {{ loan.lines|length }} équipement{{ loan.lines|length > 1 ? 's' }}
+                        {%- if not loan.closed %} · {{ loan.outstandingLines|length }} à rendre{% endif %}
+                    </p>
+                </div>
+            </div>
+
+            {% if return_form and loan.outstandingLines is not empty %}
+                {{ form_start(return_form, {attr: {novalidate: 'novalidate'}}) }}
+            {% endif %}
+
+            <div>
+                {% set outstanding_index = 0 %}
+                {% for line in loan.lines %}
+                    {% set asset = line.asset %}
+                    <div class="loan-line {{ line.returned ? 'is-returned' }}">
+                        {% if not line.returned and return_form %}
+                            {% set entry = return_form.lines[outstanding_index] %}
+                            {{ form_widget(entry.returned, {attr: {'aria-label': 'Rendu : ' ~ asset.name, class: 'checkbox-lg'}}) }}
+                        {% else %}
+                            <span class="timeline-icon">{{ ux_icon(line.returned ? 'lucide:check' : 'lucide:arrow-up-right', {'aria-hidden': 'true'}) }}</span>
+                        {% endif %}
+                        <div>
+                            <a class="cell-title" href="{{ path('app_asset_show', {code: asset.code}) }}">{{ asset.name }}</a>
+                            <div class="cell-sub">
+                                <span class="code">{{ asset.code }}</span> · parti {{ line.conditionOut.label|lower }}
+                                {% if line.returned %}
+                                    · rendu le {{ line.returnedAt|format_date('medium') }}, {{ line.conditionIn.label|lower }}
+                                    {% if line.receivedBy %}(reçu par {{ line.receivedBy.fullName }}){% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if not line.returned and return_form %}
+                            {{ form_widget(entry.condition, {attr: {'aria-label': 'État au retour : ' ~ asset.name}}) }}
+                            {% set outstanding_index = outstanding_index + 1 %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if return_form and loan.outstandingLines is not empty %}
+                <div class="form-actions">
+                    <p class="subtle form-actions-hint">Décochez ce qui n’est pas encore revenu.</p>
+                    <button class="btn btn-primary" type="submit">{{ ux_icon('lucide:arrow-down-left', {'aria-hidden': 'true'}) }} Enregistrer le retour</button>
+                </div>
+                {{ form_end(return_form) }}
+            {% endif %}
+        </section>
+
+        <div class="stack">
+            <section class="card" aria-labelledby="details">
+                <div class="card-header">
+                    <h2 class="card-title" id="details">Détails</h2>
+                </div>
+                <div class="card-body">
+                    <dl class="meta-list">
+                        <div>
+                            <dt>Retour prévu</dt>
+                            <dd>
+                                {{ loan.dueAt|format_date('long') }}
+                                {% if not loan.closed and days_late >= -6 %} · {{ include('lending/_due.html.twig') }}{% endif %}
+                            </dd>
+                        </div>
+                        {% if loan.closed %}<div><dt>Clos le</dt><dd>{{ loan.closedAt|format_datetime('long', 'short') }}</dd></div>{% endif %}
+                        <div><dt>Sorti le</dt><dd>{{ loan.lentAt|format_datetime('long', 'short') }}{% if loan.lentBy %} par {{ loan.lentBy.fullName }}{% endif %}</dd></div>
+                        {% if loan.purpose %}<div><dt>Motif</dt><dd>{{ loan.purpose }}</dd></div>{% endif %}
+                        {% if loan.borrower.account %}<div><dt>Contact</dt><dd>{{ loan.borrower.account.email }}</dd></div>{% endif %}
+                        {% if loan.notes %}<div><dt>Remarques</dt><dd>{{ loan.notes|nl2br }}</dd></div>{% endif %}
+                    </dl>
+                </div>
+            </section>
+
+            {% if extend_form %}
+                <section class="card" aria-labelledby="prolonger">
+                    <div class="card-header">
+                        <h2 class="card-title" id="prolonger">Prolonger le prêt</h2>
+                    </div>
+                    {{ form_start(extend_form, {attr: {class: 'card-body stack-sm', novalidate: 'novalidate'}}) }}
+                        {{ form_row(extend_form.dueAt) }}
+                        <button class="btn btn-secondary" type="submit">Prolonger</button>
+                    {{ form_end(extend_form) }}
+                </section>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

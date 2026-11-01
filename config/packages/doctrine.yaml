@@ -1,8 +1,8 @@
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
-        # Séquence des codes d'inventaire : gérée par migration, hors du mapping ORM
-        schema_filter: ~^(?!inventory_asset_code_seq$)~
+        # Séquences des numéros lisibles (App\Shared\Doctrine\Sequences) : gérées par migration, hors du mapping ORM
+        schema_filter: ~^(?!(inventory_asset_code_seq|lending_loan_reference_seq)$)~
 
         # IMPORTANT: You MUST configure your server version,
         # either here or in the DATABASE_URL env var (see .env file)
@@ -27,6 +27,11 @@ doctrine:
                 is_bundle: false
                 dir: '%kernel.project_dir%/src/Inventory/Entity'
                 prefix: 'App\Inventory\Entity'
+            Lending:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Lending/Entity'
+                prefix: 'App\Lending\Entity'
 
 when@test:
     doctrine:

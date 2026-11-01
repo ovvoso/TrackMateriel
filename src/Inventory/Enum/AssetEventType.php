@@ -10,6 +10,8 @@ enum AssetEventType: string
     case Updated = 'updated';
     case Moved = 'moved';
     case StatusChanged = 'status_changed';
+    case Lent = 'lent';
+    case Returned = 'returned';
 
     public function icon(): string
     {
@@ -18,6 +20,8 @@ enum AssetEventType: string
             self::Updated => 'lucide:pencil',
             self::Moved => 'lucide:map-pin',
             self::StatusChanged => 'lucide:refresh-cw',
+            self::Lent => 'lucide:arrow-up-right',
+            self::Returned => 'lucide:arrow-down-left',
         };
     }
 }

@@ -8,7 +8,7 @@
     ]},
     {heading: 'Parc', items: [
         {label: 'Inventaire', icon: 'lucide:package', route: 'app_asset_index', section: 'app_asset'},
-        {label: 'Prêts', icon: 'lucide:arrow-left-right', route: null},
+        {label: is_granted('LOAN_MANAGE') ? 'Prêts' : 'Mes emprunts', icon: 'lucide:arrow-left-right', route: 'app_loan_index', section: 'app_loan'},
         {label: 'Réservations', icon: 'lucide:calendar-days', route: null},
         {label: 'Maintenance', icon: 'lucide:wrench', route: null},
     ]},

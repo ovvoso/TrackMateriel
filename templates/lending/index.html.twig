@@ -1,0 +1,125 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}{{ own_only ? 'Mes emprunts' : 'Prêts' }}{% endblock %}
+
+{% set tabs = [
+    {state: null, label: 'En cours', count: counts.ongoing},
+    {state: 'en-retard', label: 'En retard', count: counts.overdue, danger: true},
+    {state: 'rendus', label: 'Rendus', count: null},
+] %}
+{% set current = search.state ? search.state.value : null %}
+
+{% block content %}
+    <header class="page-header">
+        <div>
+            <h1 class="page-title">{{ own_only ? 'Mes emprunts' : 'Prêts' }}</h1>
+            <p class="page-lead">
+                {{ own_only
+                    ? 'Le matériel qui vous a été confié et les dates de retour prévues.'
+                    : 'Le matériel sorti, à qui il a été confié et quand il doit revenir.' }}
+            </p>
+        </div>
+        {% if is_granted('LOAN_MANAGE') %}
+            <a class="btn btn-primary" href="{{ path('app_loan_new') }}">
+                {{ ux_icon('lucide:plus', {'aria-hidden': 'true'}) }} Nouveau prêt
+            </a>
+        {% endif %}
+    </header>
+
+    <section class="card">
+        <nav class="tabs" aria-label="Filtrer les prêts">
+            {% for tab in tabs %}
+                <a class="tab" href="{{ path('app_loan_index', tab.state ? {etat: tab.state} : {}) }}" {{ current == tab.state ? 'aria-current="page"' }}>
+                    {{ tab.label }}
+                    {% if tab.count is not null %}
+                        <span class="tab-count {{ (tab.danger ?? false) and tab.count > 0 ? 'is-danger' }}">{{ tab.count }}</span>
+                    {% endif %}
+                </a>
+            {% endfor %}
+        </nav>
+
+        {% if not own_only %}
+            <form class="toolbar" method="get" role="search">
+                {% if current %}<input type="hidden" name="etat" value="{{ current }}">{% endif %}
+                <div class="field toolbar-search">
+                    <label class="field-label" for="q">Rechercher</label>
+                    <div class="search-input">
+                        {{ ux_icon('lucide:search', {'aria-hidden': 'true'}) }}
+                        <input class="input" type="search" id="q" name="q" value="{{ search.query }}" placeholder="Emprunteur, classe, référence, équipement…">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" type="submit">Rechercher</button>
+                    {% if search.query %}<a class="btn btn-ghost" href="{{ path('app_loan_index', current ? {etat: current} : {}) }}">Effacer</a>{% endif %}
+                </div>
+            </form>
+        {% endif %}
+
+        {% if page.total == 0 %}
+            {% if search.query %}
+                <twig:EmptyState icon="lucide:search-x" title="Aucun prêt ne correspond" text="Essayez un autre nom, une classe ou un code d’inventaire." />
+            {% elseif current == 'en-retard' %}
+                <twig:EmptyState icon="lucide:circle-check" title="Aucun retard" text="Tout le matériel prêté est dans les temps." />
+            {% elseif current == 'rendus' %}
+                <twig:EmptyState icon="lucide:history" title="Aucun prêt rendu pour l’instant" />
+            {% else %}
+                <twig:EmptyState icon="lucide:arrow-left-right" title="Aucun prêt en cours" text="{{ own_only ? 'Vous n’avez pas de matériel emprunté.' : 'Le matériel prêté apparaîtra ici jusqu’à son retour.' }}">
+                    {% if is_granted('LOAN_MANAGE') %}
+                        <a class="btn btn-primary" href="{{ path('app_loan_new') }}">{{ ux_icon('lucide:plus', {'aria-hidden': 'true'}) }} Nouveau prêt</a>
+                    {% endif %}
+                </twig:EmptyState>
+            {% endif %}
+        {% else %}
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Emprunteur</th>
+                            <th scope="col">Matériel</th>
+                            <th scope="col" class="hide-sm">Sorti le</th>
+                            <th scope="col">{{ current == 'rendus' ? 'Rendu le' : 'Retour prévu' }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loan in page %}
+                            {% set lines = loan.lines %}
+                            <tr>
+                                <td>
+                                    <a class="cell-title" href="{{ path('app_loan_show', {id: loan.id}) }}">{{ loan.borrower.name }}</a>
+                                    <div class="cell-sub">
+                                        <span class="code">{{ loan.reference }}</span>{% if loan.borrower.group %} · {{ loan.borrower.group }}{% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    {{ lines.first.asset.name }}
+                                    {% if lines|length > 1 %}<span class="subtle"> et {{ lines|length - 1 }} autre{{ lines|length > 2 ? 's' }}</span>{% endif %}
+                                    {% if loan.purpose %}<div class="cell-sub">{{ loan.purpose }}</div>{% endif %}
+                                </td>
+                                <td class="muted hide-sm">{{ loan.lentAt|format_date('medium') }}</td>
+                                <td>
+                                    {% if loan.closed %}
+                                        <span class="muted">{{ loan.closedAt|format_date('medium') }}</span>
+                                    {% else %}
+                                        {{ include('lending/_due.html.twig') }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <footer class="list-footer">
+                <span>{{ page.firstIndex }}–{{ page.lastIndex }} sur {{ page.total }} prêt{{ page.total > 1 ? 's' }}</span>
+                {% if page.pageCount > 1 %}
+                    {% set query = app.request.query.all %}
+                    <nav class="pagination" aria-label="Pagination">
+                        {% if page.hasPrevious %}<a class="btn btn-secondary btn-sm" href="{{ path('app_loan_index', query|merge({page: page.number - 1})) }}" rel="prev">Précédent</a>{% endif %}
+                        <span class="btn btn-ghost btn-sm" aria-current="page">Page {{ page.number }} / {{ page.pageCount }}</span>
+                        {% if page.hasNext %}<a class="btn btn-secondary btn-sm" href="{{ path('app_loan_index', query|merge({page: page.number + 1})) }}" rel="next">Suivant</a>{% endif %}
+                    </nav>
+                {% endif %}
+            </footer>
+        {% endif %}
+    </section>
+{% endblock %}

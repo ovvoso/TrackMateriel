@@ -73,17 +73,47 @@
                 <span class="kpi-value">{{ active_total|format_number }}</span>
                 <span class="kpi-hint subtle">équipements hors réforme</span>
             </a>
-            {% for status in statuses|filter(s => s.value in ['available', 'in_maintenance', 'out_of_order']) %}
-                <a class="card kpi" href="{{ path('app_asset_index', {etat: status.value}) }}">
+            {% for status in statuses|filter(s => s.value in ['available', 'on_loan', 'in_maintenance', 'out_of_order']) %}
+                {% set is_loan = status.value == 'on_loan' %}
+                <a class="card kpi" href="{{ is_loan ? path('app_loan_index') : path('app_asset_index', {etat: status.value}) }}">
                     <span class="kpi-label">{{ status.label }}</span>
                     <span class="kpi-value">{{ by_status[status.value]|format_number }}</span>
-                    <span class="kpi-hint status status-{{ status.tone }}">{{ (by_status[status.value] / active_total * 100)|round }} % du parc</span>
+                    {% if is_loan and loan_counts.overdue > 0 %}
+                        <span class="kpi-hint status status-danger">{{ loan_counts.overdue }} prêt{{ loan_counts.overdue > 1 ? 's' }} en retard</span>
+                    {% else %}
+                        <span class="kpi-hint status status-{{ status.tone }}">{{ (by_status[status.value] / active_total * 100)|round }} % du parc</span>
+                    {% endif %}
                 </a>
             {% endfor %}
         </div>
 
         <div class="grid-2">
             <div class="stack">
+                <section class="card" aria-labelledby="retours">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title" id="retours">Retours attendus</h2>
+                            <p class="card-subtitle">En retard ou prévus dans les trois prochains jours.</p>
+                        </div>
+                        <a class="btn btn-ghost btn-sm" href="{{ path('app_loan_index') }}">Tous les prêts</a>
+                    </div>
+                    {% if returns_due is empty %}
+                        <twig:EmptyState icon="lucide:calendar-check" title="Aucun retour imminent" text="Aucun prêt n’arrive à échéance dans les trois prochains jours." />
+                    {% else %}
+                        <ul class="list-plain">
+                            {% for loan in returns_due %}
+                                <li>
+                                    <div>
+                                        <a class="cell-title" href="{{ path('app_loan_show', {id: loan.id}) }}">{{ loan.borrower.describe }}</a>
+                                        <div class="cell-sub"><span class="code">{{ loan.reference }}</span> · {{ loan.lines|length }} équipement{{ loan.lines|length > 1 ? 's' }}</div>
+                                    </div>
+                                    {{ include('lending/_due.html.twig') }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </section>
+
                 <section class="card" aria-labelledby="activite">
                     <div class="card-header">
                         <h2 class="card-title" id="activite">Activité récente</h2>

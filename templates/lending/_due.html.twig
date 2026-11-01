@@ -1,0 +1,17 @@
+{# Échéance d'un prêt ouvert : « dans 3 jours », « aujourd'hui », « 2 jours de retard » #}
+{% set late = loan.daysLate(today) %}
+<span class="due {{ late > 0 ? 'is-late' }}" title="{{ loan.dueAt|format_date('long') }}">
+    {%- if loan.closed -%}
+        {{ loan.dueAt|format_date('medium') }}
+    {%- elseif late > 0 -%}
+        {{ late }} jour{{ late > 1 ? 's' }} de retard
+    {%- elseif late == 0 -%}
+        Aujourd’hui
+    {%- elseif late == -1 -%}
+        Demain
+    {%- elseif late >= -6 -%}
+        Dans {{ -late }} jours
+    {%- else -%}
+        {{ loan.dueAt|format_date('medium') }}
+    {%- endif -%}
+</span>

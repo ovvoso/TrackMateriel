@@ -115,6 +115,26 @@ class AssetRepository extends ServiceEntityRepository
         return $assets;
     }
 
+    /**
+     * Équipements disponibles, groupables par catégorie, pour composer un prêt.
+     *
+     * @return list<Asset>
+     */
+    public function findAvailable(): array
+    {
+        /** @var list<Asset> $assets */
+        $assets = $this->createQueryBuilder('a')
+            ->addSelect('c', 'l')
+            ->join('a.category', 'c')
+            ->leftJoin('a.location', 'l')
+            ->where('a.status = :available')
+            ->setParameter('available', AssetStatus::Available)
+            ->orderBy('c.name')->addOrderBy('a.name')->addOrderBy('a.code')
+            ->getQuery()->getResult();
+
+        return $assets;
+    }
+
     private function searchQuery(AssetSearch $search): QueryBuilder
     {
         $qb = $this->createQueryBuilder('a')

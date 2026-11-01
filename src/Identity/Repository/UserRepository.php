@@ -35,6 +35,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $this->findOneByEmail($identifier);
     }
 
+    /**
+     * @return list<User>
+     */
+    public function findActiveOrderedByName(): array
+    {
+        return $this->findBy(['active' => true], ['lastName' => 'ASC', 'firstName' => 'ASC']);
+    }
+
     public function save(User $user): void
     {
         $this->getEntityManager()->persist($user);

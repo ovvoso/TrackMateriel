@@ -15,6 +15,7 @@ framework:
             places:
                 - available
                 - in_service
+                - on_loan
                 - in_maintenance
                 - out_of_order
                 - retired
@@ -44,6 +45,18 @@ framework:
                     to: out_of_order
                     guard: "is_granted('ROLE_TECHNICIEN')"
                     metadata: { label: 'Déclarer hors service', icon: 'lucide:circle-x' }
+                # Prêt et retour passent par le module Prêts (« internal ») : ils ont
+                # besoin d'un emprunteur et d'une date de retour, pas d'un simple bouton.
+                lend:
+                    from: available
+                    to: on_loan
+                    guard: "is_granted('ROLE_GESTIONNAIRE')"
+                    metadata: { label: 'Prêter', internal: true }
+                give_back:
+                    from: on_loan
+                    to: available
+                    guard: "is_granted('ROLE_GESTIONNAIRE')"
+                    metadata: { label: 'Retour de prêt', internal: true }
                 retire:
                     from: [available, out_of_order]
                     to: retired

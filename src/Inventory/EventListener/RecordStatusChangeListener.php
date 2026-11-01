@@ -33,8 +33,15 @@ final readonly class RecordStatusChangeListener
 
         $transition = $event->getTransition();
         \assert(null !== $transition);
+        $metadata = $this->lifecycle->getMetadataStore()->getTransitionMetadata($transition);
+
+        // Prêt et retour : le module Prêts inscrit lui-même un événement plus parlant
+        if ($metadata['internal'] ?? false) {
+            return;
+        }
+
         $from = $transition->getFroms()[0];
-        $label = $this->lifecycle->getMetadataStore()->getTransitionMetadata($transition)['label'] ?? $transition->getName();
+        $label = $metadata['label'] ?? $transition->getName();
         \assert(\is_string($from) && \is_string($label));
 
         $this->history->record($asset, AssetEventType::StatusChanged, \sprintf(

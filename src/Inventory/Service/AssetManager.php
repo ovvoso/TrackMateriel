@@ -11,6 +11,7 @@ use App\Inventory\Form\AssetInput;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Workflow\Exception\TransitionException;
+use Symfony\Component\Workflow\Exception\UndefinedTransitionException;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
@@ -102,6 +103,13 @@ final readonly class AssetManager
      */
     public function apply(Asset $asset, string $transition): void
     {
+        // Les transitions internes (prêt, retour) ne se déclenchent que depuis leur module
+        foreach ($this->lifecycle->getDefinition()->getTransitions() as $candidate) {
+            if ($candidate->getName() === $transition && ($this->lifecycle->getMetadataStore()->getTransitionMetadata($candidate)['internal'] ?? false)) {
+                throw new UndefinedTransitionException($asset, $transition, $this->lifecycle);
+            }
+        }
+
         $this->lifecycle->apply($asset, $transition);
         $this->entityManager->flush();
     }

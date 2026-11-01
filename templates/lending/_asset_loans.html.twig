@@ -1,0 +1,31 @@
+<section {{ attributes.defaults({class: 'card', 'aria-labelledby': 'prets'}) }}>
+    {% set history = this.history %}
+    {% set current = this.current %}
+    {% set today = date('today') %}
+    <div class="card-header">
+        <h2 class="card-title" id="prets">Prêts</h2>
+        {% if current %}
+            {% set loan = current %}
+            {{ include('lending/_due.html.twig') }}
+        {% endif %}
+    </div>
+    {% if history is empty %}
+        <div class="card-body"><p class="subtle">Cet équipement n’a jamais été prêté.</p></div>
+    {% else %}
+        <ul class="list-plain">
+            {% for loan in history %}
+                <li>
+                    <div>
+                        {% if is_granted('LOAN_VIEW', loan) %}
+                            <a class="cell-title" href="{{ path('app_loan_show', {id: loan.id}) }}">{{ loan.borrower.describe }}</a>
+                        {% else %}
+                            <span class="cell-title">{{ loan.borrower.describe }}</span>
+                        {% endif %}
+                        <div class="cell-sub"><span class="code">{{ loan.reference }}</span>{% if loan.purpose %} · {{ loan.purpose }}{% endif %}</div>
+                    </div>
+                    <span class="subtle">{{ loan.lentAt|format_date('medium') }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>
