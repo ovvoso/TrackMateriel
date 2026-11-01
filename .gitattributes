@@ -1,0 +1,4 @@
+# Fins de ligne Unix dans le dépôt (scripts exécutés dans l'image Docker)
+* text=auto eol=lf
+*.woff2 binary
+*.png binary
