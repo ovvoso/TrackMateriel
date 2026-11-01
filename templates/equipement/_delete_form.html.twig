@@ -1,7 +1,0 @@
-<form method="post" action="{{ path('app_equipement_delete', {'id': equipement.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ equipement.id) }}">
-    <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette attribution ?');">
-        <i class="fas fa-trash me-2"></i>Confirmer la suppression
-    </button>
-</form>
-

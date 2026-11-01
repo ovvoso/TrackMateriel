@@ -1,4 +1,0 @@
-'This value should not be blank.': 'Cette valeur ne doit pas être vide.'
-'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.': 'Cette valeur est trop courte. Elle doit avoir {{ limit }} caractère ou plus.|Cette valeur est trop courte. Elle doit avoir {{ limit }} caractères ou plus.'
-'Invalid email address.': 'Adresse email invalide.'
-'Il existe déjà un compte avec cet email': 'Il existe déjà un compte avec cet email'
