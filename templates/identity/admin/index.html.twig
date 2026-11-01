@@ -1,0 +1,95 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}Utilisateurs{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <div>
+            <h1 class="page-title">Utilisateurs</h1>
+            <p class="page-lead">Les personnes qui accèdent à TrackMatériel et leur profil. Chaque compte est créé par invitation.</p>
+        </div>
+        <a class="btn btn-primary" href="{{ path('app_user_invite') }}">
+            {{ ux_icon('lucide:user-plus', {'aria-hidden': 'true'}) }} Inviter
+        </a>
+    </header>
+
+    <section class="card">
+        <form class="toolbar" method="get" role="search">
+            <div class="field toolbar-search">
+                <label class="field-label" for="q">Rechercher</label>
+                <div class="search-input">
+                    {{ ux_icon('lucide:search', {'aria-hidden': 'true'}) }}
+                    <input class="input" type="search" id="q" name="q" value="{{ query }}" placeholder="Nom, prénom ou adresse e-mail">
+                </div>
+            </div>
+            <div class="field">
+                <label class="field-label" for="profil">Profil</label>
+                <select class="input select" id="profil" name="profil">
+                    <option value="">Tous</option>
+                    {% for r in roles %}
+                        <option value="{{ r.value }}" {{ role == r ? 'selected' }}>{{ r.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label class="field-label" for="statut">Statut</label>
+                <select class="input select" id="statut" name="statut">
+                    {% for value, label in {'': 'Tous', actifs: 'Actifs', invites: 'Invitation en attente', desactives: 'Désactivés'} %}
+                        <option value="{{ value }}" {{ status == value ? 'selected' }}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" type="submit">Filtrer</button>
+                {% if query or role or status %}<a class="btn btn-ghost" href="{{ path('app_user_index') }}">Effacer</a>{% endif %}
+            </div>
+        </form>
+
+        {% if page.total == 0 %}
+            <twig:EmptyState icon="lucide:search-x" title="Aucun compte ne correspond" text="Modifiez ou effacez les filtres." />
+        {% else %}
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Personne</th>
+                            <th scope="col">Profil</th>
+                            <th scope="col">Statut</th>
+                            <th scope="col" class="hide-sm">Dernière connexion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in page %}
+                            <tr>
+                                <td>
+                                    <div class="person">
+                                        <span class="avatar" aria-hidden="true">{{ user.initials }}</span>
+                                        <div>
+                                            <a class="cell-title" href="{{ path('app_user_edit', {id: user.id}) }}">{{ user.lastName }} {{ user.firstName }}</a>
+                                            {% if user == app.user %}<span class="badge">Vous</span>{% endif %}
+                                            <div class="cell-sub">{{ user.email }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="muted">{{ user.role.label }}</td>
+                                <td>{{ include('identity/admin/_status.html.twig') }}</td>
+                                <td class="muted hide-sm">{{ user.lastLoginAt ? user.lastLoginAt|format_date('medium') : '—' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <footer class="list-footer">
+                <span>{{ page.total }} compte{{ page.total > 1 ? 's' }}</span>
+                {% if page.pageCount > 1 %}
+                    {% set q = app.request.query.all %}
+                    <nav class="pagination" aria-label="Pagination">
+                        {% if page.hasPrevious %}<a class="btn btn-secondary btn-sm" href="{{ path('app_user_index', q|merge({page: page.number - 1})) }}" rel="prev">Précédent</a>{% endif %}
+                        <span class="btn btn-ghost btn-sm" aria-current="page">Page {{ page.number }} / {{ page.pageCount }}</span>
+                        {% if page.hasNext %}<a class="btn btn-secondary btn-sm" href="{{ path('app_user_index', q|merge({page: page.number + 1})) }}" rel="next">Suivant</a>{% endif %}
+                    </nav>
+                {% endif %}
+            </footer>
+        {% endif %}
+    </section>
+{% endblock %}

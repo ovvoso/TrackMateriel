@@ -55,6 +55,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $lastLoginAt = null;
 
+    /** Date à laquelle la personne a choisi son mot de passe ; null tant que l'invitation est en attente */
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $activatedAt = null;
+
     public function __construct(string $email, string $firstName, string $lastName, Role $role = Role::Usager)
     {
         $this->id = Uuid::v7();
@@ -126,7 +130,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->active = false;
     }
 
-    public function activate(): void
+    public function reactivate(): void
     {
         $this->active = true;
     }
@@ -144,6 +148,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function recordLogin(\DateTimeImmutable $at): void
     {
         $this->lastLoginAt = $at;
+    }
+
+    public function isActivated(): bool
+    {
+        return null !== $this->activatedAt;
+    }
+
+    public function getActivatedAt(): ?\DateTimeImmutable
+    {
+        return $this->activatedAt;
+    }
+
+    /**
+     * Première définition du mot de passe : le compte devient utilisable.
+     */
+    public function activate(string $hashedPassword, \DateTimeImmutable $at): void
+    {
+        if ($this->isActivated()) {
+            throw new \LogicException('Ce compte est déjà activé.');
+        }
+
+        $this->password = $hashedPassword;
+        $this->activatedAt = $at;
     }
 
     public function getUserIdentifier(): string

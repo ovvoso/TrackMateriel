@@ -17,10 +17,8 @@ framework:
         buses:
             messenger.bus.default: []
 
+        # Les e-mails partent pendant la requête : l'hébergement (un seul conteneur)
+        # n'a pas de processus « worker » permanent pour vider une file d'attente.
         routing:
-            Symfony\Component\Mailer\Messenger\SendEmailMessage: async
             Symfony\Component\Notifier\Message\ChatMessage: async
             Symfony\Component\Notifier\Message\SmsMessage: async
-
-            # Route your messages to the transports
-            # 'App\Message\YourMessage': async

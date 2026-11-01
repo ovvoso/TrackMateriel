@@ -1,0 +1,12 @@
+{% extends 'email/base.html.twig' %}
+
+{% block content %}
+    <h1 style="margin:0 0 16px;font-size:22px;line-height:1.3;">Bonjour {{ user.firstName }},</h1>
+    <p style="margin:0 0 12px;">
+        {% if invited_by %}{{ invited_by.fullName }} vous a ouvert{% else %}Vous disposez d’{% endif %}un accès à TrackMatériel,
+        l’outil de gestion du matériel de votre établissement, avec le profil <strong>{{ user.role.label }}</strong>.
+    </p>
+    <p style="margin:0;">Pour activer votre compte, choisissez votre mot de passe :</p>
+    {{ include('email/_button.html.twig', {label: 'Activer mon compte'}) }}
+    <p style="margin:24px 0 0;font-size:14px;color:#5a5752;">Ce lien est personnel et reste valable 7 jours. Votre identifiant de connexion sera {{ user.email }}.</p>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'layout/auth.html.twig' %}
+
+{% block title %}Nouveau mot de passe{% endblock %}
+
+{% block auth %}
+    <h1 class="auth-title">Nouveau mot de passe</h1>
+    <p class="auth-lead">Pour le compte <strong>{{ user.email }}</strong>.</p>
+
+    {{ form_start(form, {attr: {class: 'auth-form', novalidate: 'novalidate'}}) }}
+        {{ form_row(form.password.first) }}
+        {{ form_row(form.password.second) }}
+        <button type="submit" class="btn btn-primary btn-block">Enregistrer le mot de passe</button>
+    {{ form_end(form) }}
+{% endblock %}

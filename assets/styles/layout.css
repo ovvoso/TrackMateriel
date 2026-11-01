@@ -121,7 +121,26 @@ a.nav-link:hover {
     border-top: 1px solid var(--border);
 }
 
+.sidebar-account {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+    margin: calc(-1 * var(--space-2));
+    padding: var(--space-2);
+    border-radius: var(--radius-md);
+    color: inherit;
+}
+
+.sidebar-account:hover,
+.sidebar-account[aria-current='page'] {
+    background: var(--surface-hover);
+    text-decoration: none;
+}
+
 .sidebar-user {
+    display: grid;
     flex: 1;
     min-width: 0;
     line-height: var(--leading-tight);
@@ -327,6 +346,47 @@ a.nav-link:hover {
 .auth-note {
     font-size: var(--text-xs);
     color: var(--text-subtle);
+}
+
+.auth-form-wrap > .flashes {
+    margin-bottom: var(--space-6);
+}
+
+.auth-icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: var(--space-5);
+    border-radius: var(--radius-full);
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.auth-icon.is-warning {
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.auth-icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.auth-lead + .btn,
+.auth-lead + .auth-note {
+    margin-top: var(--space-6);
+}
+
+.field-label-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.field-link {
+    font-size: var(--text-sm);
 }
 
 .auth-aside {

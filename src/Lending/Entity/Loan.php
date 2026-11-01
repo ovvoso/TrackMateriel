@@ -62,6 +62,10 @@ class Loan
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes;
 
+    /** Dernier rappel de retour envoyé à l'emprunteur */
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $lastReminderAt = null;
+
     /**
      * @var Collection<int, LoanLine>
      */
@@ -151,6 +155,16 @@ class Loan
     public function getNotes(): ?string
     {
         return $this->notes;
+    }
+
+    public function getLastReminderAt(): ?\DateTimeImmutable
+    {
+        return $this->lastReminderAt;
+    }
+
+    public function recordReminder(\DateTimeImmutable $at): void
+    {
+        $this->lastReminderAt = $at;
     }
 
     /**

@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{# Écrans d'accès (connexion, activation, mot de passe) : formulaire à gauche, marque à droite #}
+{% block body %}
+    <div class="auth">
+        <main class="auth-main">
+            <twig:Logo />
+
+            <div class="auth-form-wrap">
+                {{ include('_flashes.html.twig') }}
+                {% block auth %}{% endblock %}
+            </div>
+        </main>
+
+        <aside class="auth-aside" aria-hidden="true">
+            <div class="auth-tag">
+                <span>INV-2026-00417</span>
+                <strong>Vidéoprojecteur Epson EB-L210</strong>
+                <span>Bât. A · Salle 104</span>
+            </div>
+            <p class="auth-quote">Chaque équipement à sa place, disponible quand le cours commence.</p>
+            <ul class="auth-points">
+                <li>{{ ux_icon('lucide:package-check') }} Inventaire tenu à jour, du stock à la réforme</li>
+                <li>{{ ux_icon('lucide:calendar-check') }} Prêts suivis jusqu’au retour, sans oubli</li>
+                <li>{{ ux_icon('lucide:wrench') }} Pannes signalées et suivies jusqu’à la réparation</li>
+            </ul>
+        </aside>
+    </div>
+{% endblock %}

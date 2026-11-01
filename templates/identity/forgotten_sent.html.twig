@@ -1,0 +1,13 @@
+{% extends 'layout/auth.html.twig' %}
+
+{% block title %}Vérifiez votre messagerie{% endblock %}
+
+{% block auth %}
+    <span class="auth-icon">{{ ux_icon('lucide:mail-check', {'aria-hidden': 'true'}) }}</span>
+    <h1 class="auth-title">Vérifiez votre messagerie</h1>
+    <p class="auth-lead">
+        Si un compte existe pour cette adresse, un lien vient d’y être envoyé. Il reste valable une heure.
+        Pensez à regarder dans les courriers indésirables.
+    </p>
+    <p class="auth-note"><a href="{{ path('app_login') }}">Retour à la connexion</a></p>
+{% endblock %}

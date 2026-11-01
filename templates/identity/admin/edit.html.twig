@@ -1,0 +1,73 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}{{ user.fullName }}{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <div class="person person-lg">
+            <span class="avatar avatar-lg" aria-hidden="true">{{ user.initials }}</span>
+            <div>
+                <p class="page-eyebrow"><a href="{{ path('app_user_index') }}">Utilisateurs</a></p>
+                <h1 class="page-title">{{ user.fullName }}</h1>
+                <p class="page-lead">{{ user.email }} · {{ include('identity/admin/_status.html.twig') }}</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="grid-2">
+        {{ form_start(form, {attr: {class: 'card', novalidate: 'novalidate'}}) }}
+            <div class="card-header">
+                <h2 class="card-title">Identité et profil</h2>
+            </div>
+            <section class="form-section">
+                <div class="form-grid">
+                    {{ form_row(form.firstName) }}
+                    {{ form_row(form.lastName) }}
+                    {{ form_row(form.role, {row_attr: {class: 'span-2'}}) }}
+                </div>
+            </section>
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Enregistrer</button>
+            </div>
+        {{ form_end(form) }}
+
+        <div class="stack">
+            <section class="card" aria-labelledby="acces">
+                <div class="card-header">
+                    <h2 class="card-title" id="acces">Accès</h2>
+                </div>
+                <div class="card-body stack-md">
+                    <dl class="meta-list">
+                        <div><dt>Compte créé le</dt><dd>{{ user.createdAt|format_date('long') }}</dd></div>
+                        <div><dt>Activé le</dt><dd>{{ user.activatedAt ? user.activatedAt|format_date('long') : 'Pas encore' }}</dd></div>
+                        <div><dt>Dernière connexion</dt><dd>{{ user.lastLoginAt ? user.lastLoginAt|format_datetime('long', 'short') : 'Jamais' }}</dd></div>
+                        <div><dt>Prêts en cours</dt><dd>{{ open_loans.ongoing }}{% if open_loans.overdue > 0 %} <span class="status status-danger">dont {{ open_loans.overdue }} en retard</span>{% endif %}</dd></div>
+                    </dl>
+
+                    {% if user.active and not user.activated %}
+                        <form method="post" action="{{ path('app_user_resend', {id: user.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('user-invite-' ~ user.id) }}">
+                            <p class="field-help">{{ invitation_pending ? 'Une invitation est en attente.' : 'L’invitation a expiré.' }} Un nouvel envoi rend les liens précédents inutilisables.</p>
+                            <button class="btn btn-secondary btn-block" type="submit">{{ ux_icon('lucide:send', {'aria-hidden': 'true'}) }} Renvoyer l’invitation</button>
+                        </form>
+                    {% endif %}
+
+                    {% if not is_self %}
+                        {% if user.active %}
+                            <form method="post" action="{{ path('app_user_deactivate', {id: user.id}) }}"
+                                  data-turbo-confirm="Désactiver le compte de {{ user.fullName }} ? Il ne pourra plus se connecter ; son historique est conservé.">
+                                <input type="hidden" name="_token" value="{{ csrf_token('user-status-' ~ user.id) }}">
+                                <button class="btn btn-danger btn-block" type="submit">{{ ux_icon('lucide:user-x', {'aria-hidden': 'true'}) }} Désactiver le compte</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{{ path('app_user_reactivate', {id: user.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('user-status-' ~ user.id) }}">
+                                <button class="btn btn-secondary btn-block" type="submit">{{ ux_icon('lucide:user-check', {'aria-hidden': 'true'}) }} Réactiver le compte</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </div>
+{% endblock %}

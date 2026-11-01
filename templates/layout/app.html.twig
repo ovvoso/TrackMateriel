@@ -15,7 +15,7 @@
     {heading: 'Organisation', items: [
         {label: 'Emplacements', icon: 'lucide:map-pin', route: 'app_location_index', section: 'app_location'},
         {label: 'Catégories', icon: 'lucide:tags', route: 'app_category_index', section: 'app_category', role: 'INVENTORY_MANAGE'},
-        {label: 'Utilisateurs', icon: 'lucide:users', route: null, role: 'ROLE_ADMIN'},
+        {label: 'Utilisateurs', icon: 'lucide:users', route: 'app_user_index', section: 'app_user', role: 'ROLE_ADMIN'},
     ]},
 ] %}
 
@@ -53,11 +53,13 @@
             </nav>
 
             <div class="sidebar-footer">
-                <span class="avatar" aria-hidden="true">{{ app.user.initials }}</span>
-                <div class="sidebar-user">
-                    <p class="sidebar-user-name">{{ app.user.fullName }}</p>
-                    <p class="sidebar-user-role">{{ app.user.role.label }}</p>
-                </div>
+                <a class="sidebar-account" href="{{ path('app_profile') }}" title="Mon compte" {{ app.current_route == 'app_profile' ? 'aria-current="page"' }}>
+                    <span class="avatar" aria-hidden="true">{{ app.user.initials }}</span>
+                    <span class="sidebar-user">
+                        <span class="sidebar-user-name">{{ app.user.fullName }}</span>
+                        <span class="sidebar-user-role">{{ app.user.role.label }}</span>
+                    </span>
+                </a>
                 <form method="post" action="{{ path('app_logout') }}">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}" data-controller="csrf-protection">
                     <button type="submit" class="icon-btn" title="Se déconnecter">

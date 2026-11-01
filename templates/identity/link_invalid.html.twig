@@ -1,0 +1,15 @@
+{% extends 'layout/auth.html.twig' %}
+
+{% block title %}Lien expiré{% endblock %}
+
+{% block auth %}
+    <span class="auth-icon is-warning">{{ ux_icon('lucide:link-2-off', {'aria-hidden': 'true'}) }}</span>
+    <h1 class="auth-title">Ce lien n’est plus valable</h1>
+    {% if purpose == 'invitation' %}
+        <p class="auth-lead">Il a déjà servi, a expiré au bout de 7 jours ou a été remplacé par une invitation plus récente. Demandez à votre administrateur de vous la renvoyer.</p>
+    {% else %}
+        <p class="auth-lead">Il a déjà servi, a expiré au bout d’une heure ou a été remplacé par une demande plus récente.</p>
+        <a class="btn btn-primary btn-block" href="{{ path('app_password_forgotten') }}">Demander un nouveau lien</a>
+    {% endif %}
+    <p class="auth-note"><a href="{{ path('app_login') }}">Retour à la connexion</a></p>
+{% endblock %}

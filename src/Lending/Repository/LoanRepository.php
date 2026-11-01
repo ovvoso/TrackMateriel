@@ -144,6 +144,31 @@ class LoanRepository extends ServiceEntityRepository
         return $loans;
     }
 
+    /**
+     * Prêts dont l'emprunteur (avec compte actif) doit recevoir un rappel :
+     * la veille de l'échéance, puis tous les trois jours tant que le retard dure.
+     *
+     * @return list<Loan>
+     */
+    public function findDueForReminder(\DateTimeImmutable $today): array
+    {
+        /** @var list<Loan> $loans */
+        $loans = $this->createQueryBuilder('l')
+            ->addSelect('u', 'line', 'a')
+            ->join('l.borrowerAccount', 'u')
+            ->join('l.lines', 'line')
+            ->join('line.asset', 'a')
+            ->where('l.closedAt IS NULL AND u.active = true')
+            ->andWhere('(l.dueAt = :tomorrow AND l.lastReminderAt IS NULL) OR (l.dueAt < :today AND (l.lastReminderAt IS NULL OR l.lastReminderAt < :threeDaysAgo))')
+            ->setParameter('today', $today)
+            ->setParameter('tomorrow', $today->modify('+1 day'))
+            ->setParameter('threeDaysAgo', $today->modify('-2 days'))
+            ->orderBy('l.dueAt', 'ASC')
+            ->getQuery()->getResult();
+
+        return $loans;
+    }
+
     private function restrictTo(QueryBuilder $qb, ?User $borrower): void
     {
         if (null !== $borrower) {

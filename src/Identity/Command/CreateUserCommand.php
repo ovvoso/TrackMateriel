@@ -69,7 +69,7 @@ final readonly class CreateUserCommand
             return Command::INVALID;
         }
 
-        $user->setPassword($this->hasher->hashPassword($user, $password));
+        $user->activate($this->hasher->hashPassword($user, $password), new \DateTimeImmutable());
         $this->users->save($user);
 
         $io->success(\sprintf('Compte %s créé (%s).', $user->getEmail(), $profile->label()));

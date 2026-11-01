@@ -1,0 +1,47 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}Mon compte{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <div class="person person-lg">
+            <span class="avatar avatar-lg" aria-hidden="true">{{ app.user.initials }}</span>
+            <div>
+                <h1 class="page-title">{{ app.user.fullName }}</h1>
+                <p class="page-lead">{{ app.user.email }} · {{ app.user.role.label }}</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="grid-2">
+        {{ form_start(form, {attr: {class: 'card', novalidate: 'novalidate'}}) }}
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Changer de mot de passe</h2>
+                    <p class="card-subtitle">Les autres appareils restés connectés devront se reconnecter.</p>
+                </div>
+            </div>
+            <section class="form-section stack-md">
+                {{ form_row(form.currentPassword) }}
+                {{ form_row(form.password.first) }}
+                {{ form_row(form.password.second) }}
+            </section>
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Changer le mot de passe</button>
+            </div>
+        {{ form_end(form) }}
+
+        <section class="card" aria-labelledby="infos">
+            <div class="card-header">
+                <h2 class="card-title" id="infos">Informations</h2>
+            </div>
+            <div class="card-body">
+                <dl class="meta-list">
+                    <div><dt>Profil</dt><dd><span class="badge badge-accent">{{ app.user.role.label }}</span></dd></div>
+                    <div><dt>Membre depuis</dt><dd>{{ app.user.createdAt|format_date('long') }}</dd></div>
+                </dl>
+                <p class="field-help note">Pour changer votre nom, votre adresse ou votre profil, adressez-vous à un administrateur.</p>
+            </div>
+        </section>
+    </div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'email/base.html.twig' %}
+
+{% set account = loan.borrower.account %}
+
+{% block content %}
+    <h1 style="margin:0 0 16px;font-size:22px;line-height:1.3;">Bonjour {{ account.firstName }},</h1>
+    <p style="margin:0 0 16px;">
+        {% if late > 0 %}
+            Le matériel ci-dessous devait être rendu le <strong>{{ loan.dueAt|format_date('long', locale: 'fr') }}</strong>,
+            il y a {{ late }} jour{{ late > 1 ? 's' }}. Merci de le rapporter au plus vite au gestionnaire du parc.
+        {% else %}
+            Petit rappel : le matériel ci-dessous est à rendre <strong>demain, {{ loan.dueAt|format_date('long', locale: 'fr') }}</strong>.
+        {% endif %}
+    </p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e1dfdb;border-radius:8px;border-collapse:separate;">
+        {% for line in loan.outstandingLines %}
+            <tr>
+                <td style="padding:12px 16px;{{ not loop.first ? 'border-top:1px solid #e1dfdb;' }}">
+                    <strong style="font-weight:600;">{{ line.asset.name }}</strong><br>
+                    <span style="font-family:'IBM Plex Mono',Consolas,monospace;font-size:13px;color:#5a5752;">{{ line.asset.code }}</span>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {{ include('email/_button.html.twig', {label: 'Voir le prêt ' ~ loan.reference}) }}
+    <p style="margin:24px 0 0;font-size:14px;color:#5a5752;">Besoin de le garder plus longtemps ? Demandez une prolongation au gestionnaire du parc.</p>
+{% endblock %}

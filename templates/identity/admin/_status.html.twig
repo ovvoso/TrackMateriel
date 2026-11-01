@@ -1,0 +1,7 @@
+{% if not user.active %}
+    <span class="status status-neutral">Désactivé</span>
+{% elseif not user.activated %}
+    <span class="status status-warning">Invitation en attente</span>
+{% else %}
+    <span class="status status-success">Actif</span>
+{% endif %}

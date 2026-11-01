@@ -8,10 +8,10 @@ Gestion du parc matériel des établissements d'enseignement : inventaire, prêt
 
 | Module | État |
 |---|---|
-| Comptes, profils et connexion sécurisée | ✅ Livré |
+| Comptes : connexion sécurisée, invitations par e-mail, mot de passe oublié, administration des comptes, « Mon compte » | ✅ Livré |
 | Inventaire : codes d'inventaire, emplacements, catégories, cycle de vie, historique, export CSV | ✅ Livré |
 | Tableau de bord : état du parc, activité récente, garanties à échéance | ✅ Livré |
-| Prêts : plusieurs équipements par prêt, emprunteurs avec ou sans compte, retours partiels, prolongation, retards | ✅ Livré |
+| Prêts : plusieurs équipements par prêt, emprunteurs avec ou sans compte, retours partiels, prolongation, retards, rappels par e-mail | ✅ Livré |
 | Réservations de matériel pour les cours | 🔜 |
 | Tickets de maintenance et maintenance préventive | 🔜 |
 | Étiquettes QR code et signalement de panne | 🔜 |
@@ -32,7 +32,7 @@ Chaque profil hérite des droits du profil inférieur. Il n'y a pas d'inscriptio
 - **PHP 8.4** et **Symfony 7.4 LTS**
 - **PostgreSQL 18** avec Doctrine ORM et migrations
 - **Twig**, Twig Components, **Turbo** et **Stimulus** (AssetMapper, sans étape de build Node)
-- Composants Symfony **Workflow**, **Scheduler**, **Messenger** et **Rate Limiter**
+- Composants Symfony **Workflow**, **Mailer** (Brevo) et **Rate Limiter**
 - Icônes **Lucide** et police **IBM Plex**, hébergées localement
 - Déploiement **Docker / FrankenPHP** sur **Railway**
 
@@ -42,8 +42,8 @@ Le code est organisé par domaine métier plutôt que par type technique :
 
 ```
 src/
-├── Identity/      Comptes, profils, connexion
-│   ├── Entity/  Enum/  Repository/  Security/  Controller/  Command/  Factory/
+├── Identity/      Comptes, profils, connexion, invitations, mots de passe
+│   ├── Entity/  Enum/  Form/  Repository/  Security/  Service/  Controller/  …
 ├── Inventory/     Emplacements, catégories, équipements, cycle de vie et journal
 │   ├── Entity/  Enum/  Form/  Service/  Security/  Validator/  EventListener/  …
 ├── Lending/       Prêts : sortie, retours partiels, prolongation, retards
@@ -62,6 +62,7 @@ Quelques choix de conception :
 - **Codes d'inventaire** au format `INV-2026-00417`, tirés d'une séquence PostgreSQL pour éviter tout doublon.
 - **Formulaires sur objets de saisie** : l'entité reste toujours valide et n'est modifiée qu'après validation.
 - **Un seul prêt ouvert par équipement**, garanti par un index unique partiel PostgreSQL en plus du contrôle applicatif : deux prêts saisis au même instant ne peuvent pas emporter le même matériel.
+- **Liens à usage unique** (invitation, mot de passe oublié) : seule l'empreinte SHA-256 du secret est stockée, la vérification se fait en temps constant, et chaque nouvel envoi invalide les précédents. La réponse à « mot de passe oublié » ne révèle jamais si une adresse a un compte, et les demandes sont limitées en fréquence.
 - **Domaines découplés** : la fiche équipement affiche ses prêts via un composant Twig fourni par le module Prêts, sans que l'Inventaire dépende des Prêts.
 
 ## Sécurité
@@ -120,7 +121,19 @@ Ces vérifications tournent à chaque push via GitHub Actions, sur une base Post
 
 ## Déploiement
 
-L'image Docker (FrankenPHP) applique les migrations au démarrage. Sur Railway, il suffit d'ajouter une base PostgreSQL et de définir `DATABASE_URL`, `APP_SECRET` et `DEFAULT_URI`.
+L'image Docker (FrankenPHP) applique les migrations au démarrage. Sur Railway, il suffit d'ajouter une base PostgreSQL et de définir les variables suivantes :
+
+| Variable | Rôle |
+|---|---|
+| `DATABASE_URL` | Base PostgreSQL |
+| `APP_SECRET` | Clé secrète de l'application (chaîne aléatoire) |
+| `DEFAULT_URI` | Adresse publique, utilisée dans les liens des e-mails |
+| `MAILER_DSN` | Envoi des e-mails, par exemple `brevo+api://CLÉ@default` |
+| `MAILER_SENDER`, `MAILER_FROM` | Adresse d'expédition validée chez le fournisseur d'envoi |
+
+Le premier administrateur se crée depuis le terminal du conteneur : `php bin/console app:user:create adresse@etablissement.fr Prénom Nom --role=admin`. Les autres comptes sont ensuite invités depuis l'application.
+
+Les rappels de retour se lancent une fois par jour (tâche planifiée Railway, par exemple à 7 h) : `php bin/console app:loans:remind`.
 
 ## Auteur
 

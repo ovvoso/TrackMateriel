@@ -46,13 +46,22 @@ final class UserFactory extends PersistentObjectFactory
         return $this->afterInstantiate(static fn (User $user) => $user->deactivate());
     }
 
+    /**
+     * Compte invité qui n'a pas encore choisi son mot de passe.
+     */
+    public function invited(): static
+    {
+        return $this->with(['plainPassword' => null]);
+    }
+
     protected function initialize(): static
     {
         return $this
             ->instantiateWith(Instantiator::withConstructor()->allowExtra('plainPassword'))
             ->afterInstantiate(function (User $user, array $attributes): void {
-                \assert(\is_string($attributes['plainPassword']));
-                $user->setPassword($this->hasher->hashPassword($user, $attributes['plainPassword']));
+                if (\is_string($attributes['plainPassword'])) {
+                    $user->activate($this->hasher->hashPassword($user, $attributes['plainPassword']), new \DateTimeImmutable('-1 day'));
+                }
             });
     }
 }

@@ -1,0 +1,8 @@
+framework:
+    rate_limiter:
+        # Demandes de lien « mot de passe oublié » : évite l'envoi d'e-mails en rafale
+        # vers une même adresse et le sondage massif depuis une même machine.
+        password_reset:
+            policy: sliding_window
+            limit: 3
+            interval: '15 minutes'

@@ -1,0 +1,28 @@
+{% extends 'layout/app.html.twig' %}
+
+{% block title %}Inviter une personne{% endblock %}
+
+{% block content %}
+    <header class="page-header">
+        <div>
+            <p class="page-eyebrow"><a href="{{ path('app_user_index') }}">Utilisateurs</a></p>
+            <h1 class="page-title">Inviter une personne</h1>
+            <p class="page-lead">Elle recevra un e-mail pour choisir son mot de passe. Aucun mot de passe ne transite par vous.</p>
+        </div>
+    </header>
+
+    {{ form_start(form, {attr: {class: 'card form-narrow', novalidate: 'novalidate'}}) }}
+        <section class="form-section">
+            <div class="form-grid">
+                {{ form_row(form.firstName) }}
+                {{ form_row(form.lastName) }}
+                {{ form_row(form.email, {row_attr: {class: 'span-2'}}) }}
+                {{ form_row(form.role, {row_attr: {class: 'span-2'}}) }}
+            </div>
+        </section>
+        <div class="form-actions">
+            <a class="btn btn-ghost" href="{{ path('app_user_index') }}">Annuler</a>
+            <button class="btn btn-primary" type="submit">{{ ux_icon('lucide:send', {'aria-hidden': 'true'}) }} Envoyer l’invitation</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

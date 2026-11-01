@@ -1,0 +1,14 @@
+{% extends 'layout/auth.html.twig' %}
+
+{% block title %}Activer votre compte{% endblock %}
+
+{% block auth %}
+    <h1 class="auth-title">Bienvenue, {{ user.firstName }}</h1>
+    <p class="auth-lead">Choisissez votre mot de passe pour activer votre compte <strong>{{ user.email }}</strong>.</p>
+
+    {{ form_start(form, {attr: {class: 'auth-form', novalidate: 'novalidate'}}) }}
+        {{ form_row(form.password.first) }}
+        {{ form_row(form.password.second) }}
+        <button type="submit" class="btn btn-primary btn-block">Activer mon compte</button>
+    {{ form_end(form) }}
+{% endblock %}

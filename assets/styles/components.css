@@ -221,6 +221,26 @@
     letter-spacing: 0.02em;
 }
 
+.avatar-lg {
+    width: 3.5rem;
+    height: 3.5rem;
+    font-size: var(--text-lg);
+}
+
+.person {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.person-lg {
+    gap: var(--space-5);
+}
+
+.person .badge {
+    margin-left: var(--space-2);
+}
+
 /* ---------- Liste d'étapes (mise en route) ---------- */
 
 .steps {

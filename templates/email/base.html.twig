@@ -1,0 +1,38 @@
+{#
+    Gabarit commun des e-mails. Styles en ligne et mise en page par tableaux :
+    c'est ce que les messageries (Outlook, Gmail…) affichent de façon fiable.
+#}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>{{ email.subject }}</title>
+</head>
+<body style="margin:0;padding:0;background:#f6f6f4;font-family:'IBM Plex Sans',Segoe UI,Helvetica,Arial,sans-serif;color:#1d1c1a;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f6f4;padding:32px 16px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
+                    <tr>
+                        <td style="padding:0 4px 20px;font-size:16px;font-weight:600;color:#0b6e63;">
+                            <span style="display:inline-block;width:22px;height:22px;margin-right:8px;border-radius:5px;background:#0b6e63;vertical-align:-5px;"></span>Track<span style="font-weight:400;color:#1d1c1a;">Matériel</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background:#ffffff;border:1px solid #e1dfdb;border-radius:12px;padding:32px;font-size:16px;line-height:1.55;">
+                            {% block content %}{% endblock %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:20px 4px 0;font-size:12px;line-height:1.5;color:#78746e;">
+                            {% block footer %}Message automatique envoyé par TrackMatériel. Merci de ne pas y répondre.{% endblock %}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
