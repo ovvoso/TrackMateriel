@@ -21,6 +21,12 @@ until php bin/console dbal:run-sql "SELECT 1" > /dev/null 2>&1; do
 done
 
 php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+
+# Instance de démonstration : l'établissement fictif est chargé au premier démarrage
+if [ "$APP_DEMO" = "1" ]; then
+    php bin/console app:demo:load --if-empty
+fi
+
 php bin/console cache:warmup
 
 exec "$@"

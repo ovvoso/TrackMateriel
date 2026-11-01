@@ -9,8 +9,11 @@ COPY docker/Caddyfile /etc/caddy/Caddyfile
 COPY docker/entrypoint.sh /usr/local/bin/app-entrypoint
 RUN chmod +x /usr/local/bin/app-entrypoint
 
+# Le conteneur n'est joignable que via le proxy HTTPS de l'hébergeur : on fait
+# confiance à ses en-têtes X-Forwarded-* (protocole, hôte, adresse du visiteur).
 ENV APP_ENV=prod \
     APP_DEBUG=0 \
+    SYMFONY_TRUSTED_PROXIES=REMOTE_ADDR \
     COMPOSER_ALLOW_SUPERUSER=1
 
 WORKDIR /app

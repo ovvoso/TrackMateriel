@@ -378,6 +378,64 @@ a.nav-link:hover {
     margin-top: var(--space-6);
 }
 
+.demo-accounts {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--border);
+}
+
+.demo-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.demo-title svg {
+    width: 1rem;
+    height: 1rem;
+    color: var(--accent);
+}
+
+.demo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+}
+
+.demo-account {
+    display: grid;
+    gap: 2px;
+    padding: var(--space-3);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color var(--transition), background-color var(--transition);
+}
+
+.demo-account:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+}
+
+.demo-role {
+    font-size: var(--text-sm);
+    font-weight: 500;
+}
+
+.demo-email {
+    overflow: hidden;
+    font-size: var(--text-xs);
+    color: var(--text-subtle);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .field-label-row {
     display: flex;
     align-items: baseline;

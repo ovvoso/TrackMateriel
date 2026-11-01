@@ -3,6 +3,8 @@
 parameters:
     # Devise des prix d'achat (code ISO 4217)
     app.currency: XOF
+    # Instance de démonstration publique (voir .env)
+    app.demo: '%env(bool:APP_DEMO)%'
 
 services:
     _defaults:
@@ -11,19 +13,5 @@ services:
 
     App\:
         resource: '../src/'
-        # Fabriques et jeux de démonstration : Foundry n'existe qu'en dev et en test
         exclude:
             - '../src/Kernel.php'
-            - '../src/*/Factory/'
-            - '../src/Story/'
-
-when@dev: &demo_data
-    services:
-        _defaults:
-            autowire: true
-            autoconfigure: true
-
-        App\:
-            resource: '../src/{*/Factory,Story}/'
-
-when@test: *demo_data

@@ -40,4 +40,19 @@
 
         <p class="auth-note">Pas encore de compte ? Les accès sont créés par l’administrateur de votre établissement.</p>
     </form>
+
+    {% if app_demo %}
+        <section class="demo-accounts" aria-labelledby="demo-titre" data-controller="demo-login" data-demo-login-password-value="{{ demo_password }}">
+            <h2 class="demo-title" id="demo-titre">{{ ux_icon('lucide:sparkles', {'aria-hidden': 'true'}) }} Démonstration : entrez avec un profil</h2>
+            <div class="demo-grid">
+                {% for email, role in constant('App\\Story\\AppStory::REFERENCE_ACCOUNTS') %}
+                    <button type="button" class="demo-account" data-email="{{ email }}" data-action="demo-login#use">
+                        <span class="demo-role">{{ role.label }}</span>
+                        <span class="demo-email">{{ email }}</span>
+                    </button>
+                {% endfor %}
+            </div>
+            <p class="auth-note">Établissement fictif, remis à zéro chaque nuit.</p>
+        </section>
+    {% endif %}
 {% endblock %}

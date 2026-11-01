@@ -3,6 +3,8 @@ twig:
     form_themes: ['form/theme.html.twig']
     globals:
         app_currency: '%app.currency%'
+        app_demo: '%app.demo%'
+        demo_password: '%env(DEMO_PASSWORD)%'
 
 when@test:
     twig:

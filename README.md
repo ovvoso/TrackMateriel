@@ -97,11 +97,11 @@ Puis :
 ```bash
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
-php bin/console foundry:load-fixtures main   # comptes de démonstration
+php bin/console app:demo:load                # établissement de démonstration
 symfony serve                                # ou : php -S 127.0.0.1:8000 -t public
 ```
 
-Les comptes de démonstration (un par profil, domaine `lycee-demo.sn`) sont définis dans `src/Story/AppStory.php`.
+Les comptes de démonstration (domaine `lycee-demo.sn`) sont définis dans `src/Story/AppStory.php` ; leur mot de passe est la variable `DEMO_PASSWORD`.
 
 Pour créer un vrai compte, par exemple le premier administrateur :
 
@@ -121,19 +121,7 @@ Ces vérifications tournent à chaque push via GitHub Actions, sur une base Post
 
 ## Déploiement
 
-L'image Docker (FrankenPHP) applique les migrations au démarrage. Sur Railway, il suffit d'ajouter une base PostgreSQL et de définir les variables suivantes :
-
-| Variable | Rôle |
-|---|---|
-| `DATABASE_URL` | Base PostgreSQL |
-| `APP_SECRET` | Clé secrète de l'application (chaîne aléatoire) |
-| `DEFAULT_URI` | Adresse publique, utilisée dans les liens des e-mails |
-| `MAILER_DSN` | Envoi des e-mails, par exemple `brevo+api://CLÉ@default` |
-| `MAILER_SENDER`, `MAILER_FROM` | Adresse d'expédition validée chez le fournisseur d'envoi |
-
-Le premier administrateur se crée depuis le terminal du conteneur : `php bin/console app:user:create adresse@etablissement.fr Prénom Nom --role=admin`. Les autres comptes sont ensuite invités depuis l'application.
-
-Les rappels de retour se lancent une fois par jour (tâche planifiée Railway, par exemple à 7 h) : `php bin/console app:loans:remind`.
+Image Docker FrankenPHP, déployée sur Railway avec PostgreSQL : voir [DEPLOY.md](DEPLOY.md) (variables, tâche quotidienne, instance de démonstration).
 
 ## Auteur
 

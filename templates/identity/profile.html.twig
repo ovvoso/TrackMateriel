@@ -14,6 +14,12 @@
     </header>
 
     <div class="grid-2">
+        {% if form is null %}
+            <section class="card">
+                <twig:EmptyState icon="lucide:lock" title="Mot de passe non modifiable"
+                    text="Sur cette instance de démonstration, les comptes sont partagés entre les visiteurs : leur mot de passe ne peut pas être changé." />
+            </section>
+        {% else %}
         {{ form_start(form, {attr: {class: 'card', novalidate: 'novalidate'}}) }}
             <div class="card-header">
                 <div>
@@ -30,6 +36,7 @@
                 <button class="btn btn-primary" type="submit">Changer le mot de passe</button>
             </div>
         {{ form_end(form) }}
+        {% endif %}
 
         <section class="card" aria-labelledby="infos">
             <div class="card-header">
