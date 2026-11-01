@@ -1,0 +1,22 @@
+# Serveur web de production (FrankenPHP / Caddy).
+# Le TLS est géré par Railway : le conteneur écoute en HTTP sur $PORT.
+# Les en-têtes de sécurité et la CSP sont posés par l'application.
+
+{
+	skip_install_trust
+	frankenphp
+}
+
+{$SERVER_NAME::8080} {
+	root public/
+	encode zstd br gzip
+
+	header -Server
+	header -X-Powered-By
+
+	# Fichiers versionnés par AssetMapper (le nom change à chaque modification) : cache d'un an
+	@versioned path /assets/*
+	header @versioned Cache-Control "public, max-age=31536000, immutable"
+
+	php_server
+}
